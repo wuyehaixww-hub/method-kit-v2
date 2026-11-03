@@ -1,0 +1,39 @@
+---
+name: coldstart-intake
+description: Use when a new project needs its cold-start surface (entry shell / current status / index) built or audited — establishes the minimal 3-file face, the byte hard gate, the R0–R3 fallback ladder, and the capacity tiers. 触发词：冷启动、入口壳、回退阶梯、容量档位、新项目开工。
+---
+
+冷启动面不是「一叠文档」，而是**三个文件 + 一道门 + 一条阶梯**：让新会话用最少上下文直接开工，同时让「超支」可被发现。
+
+## 何时用
+
+- 新项目开工，还没决定「新会话第一屏读什么」。
+- 工作区已存在，但 agent 每会话都要翻目录找料、或读一堆历史件。
+- 冷启动总量涨到撞门，或**没人知道余量还剩多少**。
+
+## 五步
+
+0. **建配置**：拷 `kit/templates/kit.config.json.template` → `<项目>/kit.config.json`（严格 JSON，直接可用）。**注意**：JSON 模板里**不能写注释** —— 这份模板的「怎么用」（每个键管什么、哪些可删）写在**本步**与 `GUIDE.md` §八，不在文件里。**先有它，脚本才认得出仓根**（向上找配置，遇 `.git` 即停）。
+   **拷完先裁**：整套照抄 = 目标项目永远用不上的噪声。**只留 `coldStart`**；**要跑 `check-kit`（第 3 步的容量判定）时**按模板补回 `capacityTiers` / `sectionRead` / `quotas`（缺任一段它会 `exit 2` 并点名缺哪段），跑完可再裁掉；`profile` / `baseline` / `pathRoots` / `idPrefixes` / `perVolumeLimitBytes` 不装 `check-kit` 就删。判据 = **逐个删键后 `node kit/scripts/cold-start-size.mjs --root .` 仍 `OK` ⇒ 该键对本项目可删**；删到「再删就红」= 最小面。**但 `coldStart` 里的 `files` / `limitBytes` / `forceArchiveMarginBytes` 不许删** —— 它们就是这道门本身（缺了它现在会 `exit 2`，别把它当噪声删掉）。**裁掉的键要登记进 `WORKSPACE-NOTES.md` 的「已知边界」行**（没有就建一条；将来跑 full profile 时要补回）。
+1. **建面**：用 `kit/templates/` 三件 —— `CLAUDE.md.template`（入口壳：行为约束 + 场景路由）、`WORKSPACE-NOTES.md.template`（当前状态 + 已定决策）、`docs-README.md.template`（索引：角色 / 何时读 / 更新触发）。三件都放**指针与状态**，不放规则正文。
+   **copy = 照抄 → 就地裁剪**（不是 merge、不是改写）：① 占位符 `<…>` 换成真实值，换不了就**删整行**（别留着等以后）；② 指向本项目**不存在文件**的每一行 → 删整行；③ 目录可以先不建，文件不行。
+   判据（可复跑）：**从 kit 根**跑 `node kit/scripts/trim-scan.mjs --root <项目目录>` —— 要看到 **占位符 0 处 · 死指针 0 处** + `OK：裁剪完成` + `exit 0`；**第一行点名量的项目根**，不是你那个项目 = 量错对象（`A-16`；脚本不拷进项目，所以别在项目里敲 `kit/…` 路径）。它只判**反引号里的引用**与**代码块里的命令行路径**（正文裸路径 / md 链接 / 锚点不判）；它是**一次性体检、不是常驻门禁**：不跑就没人知道，所以当它是交付前的一步，别当建议。
+2. **装门**：把三件路径填进 `kit.config.json` 的 `coldStart.files`，跑 `node kit/scripts/cold-start-size.mjs --root .`（**`--root .` 不能省**：不带时它量的是**脚本所在的仓**；护栏已让它 `exit 2`（= `A-16`）。脚本已拷进项目时，在项目根跑 `node scripts/cold-start-size.mjs`）。三态都要亲眼见过：缺件 `FAIL` / 超门 `FAIL` / 余量不足 `WARN 强制归档`。
+3. **装阶梯**：在入口壳里写死 R0–R3（路由命中 → 抽大纲 → 任务词 grep → 换词重试 + 报缺口），并写一句 **[硬] 没找到 ≠ 不存在，禁自创**。内容超容量时按档位拆，用 `node kit/scripts/check-kit.mjs --root <项目目录> --profile=lite` 判（从 kit 根跑；它是 kit 侧脚本，**不拷进项目** —— 且它没有 `cold-start-size` 那条「量错对象就 `exit 2`」的护栏，所以 `--root` 必须写。**`--profile=lite` 也要写**：缺省是 `full`，小项目没有 `VERSION` / `CHANGELOG` / 根 README 就会 FAIL，而那三样不是容量门该管的事）。
+   **文档在长 / 单份读不完** → `skills/doc-governance/SKILL.md`（测读上限 + 按 `P-32` 四问；阈值仍只写 `kit.config.json`）。
+4. **交付两段提示词**：拷 `kit/templates/session-prompts.md.template` → 本项目，按它的「生成规则」把 `<…>` 全部填成**本项目真实值**（入口件 / 交接件目录 / 门禁命令 / 有无 remote / harness 能力），再按 §四自检。
+   **这两段是用户每天真正要用的东西** —— 不交付它，前三步建的面用户根本不会用（面是给 agent 的，提示词是给人的）。落盘建议：与 `session-workflow.md` 放一起（同一份事实的两个视图，改一处记得改另一处）。
+
+## 反例
+
+- **A-01 冷启动「余量还有」是假象** —— 字节数只代表测量那一秒；写进文档就再没人重测它。
+- **A-02 查询型文档没有硬顶** —— 台账会一路长到 200 KB+，而门禁只出一条 `WARN`。
+- **A-03 探针「只在声明了才校验」** —— 于是最大的文件往往正是没声明的那个。
+- **A-17 照字面 copy 模板 = 死指针；能躲开全靠执行者越权改写** —— 目标仓的门只查字节与存在性，空指针一路绿；所以要「裁完再交付」，别指望门替你发现。
+
+## 不做
+
+- 不把规则正文搬进三件（三件只放指针，正文进真源目录）。
+- 不做「建议 / 尽量」类软约束：**要么是门禁，要么写清它是提示**，别伪装成门禁。
+- 不新增手写节索引（标题即索引；`read-plan.mjs` 现抽）。
+- 不替用户决定「收哪些规则」——「收不收」是价值判断，不是事实判断。

@@ -1,0 +1,242 @@
+{
+  "version": "0.2.0-dev",
+  "updatedAt": "2026-11-02",
+  "axes": {
+    "horizon": {
+      "values": [
+        "oneoff",
+        "weeks",
+        "long"
+      ],
+      "default": "weeks",
+      "question": "做到什么程度算完成？（做完就扔 / 会改几次 / 长期养）"
+    },
+    "risk": {
+      "values": [
+        "none",
+        "contract",
+        "data"
+      ],
+      "default": "none",
+      "question": "最怕哪种坏结果？（无所谓 / 改坏对外契约 / 丢数据或写坏持久化）"
+    },
+    "scale": {
+      "values": [
+        "tiny",
+        "small",
+        "medium",
+        "large"
+      ],
+      "default": "small",
+      "question": "体量（扫描器实测，用户可一句话推翻）"
+    },
+    "agency": {
+      "values": [
+        "human",
+        "copilot",
+        "agent"
+      ],
+      "default": "copilot",
+      "question": "谁拍板？（你 / 你听建议 / AI 执行你抽查）"
+    }
+  },
+  "always": [
+    "coldstart",
+    "agency",
+    "intake",
+    "workflow"
+  ],
+  "include": {
+    "horizon": {
+      "oneoff": [],
+      "weeks": [
+        "closeout",
+        "progress"
+      ],
+      "long": [
+        "closeout",
+        "relay",
+        "evidence",
+        "progress"
+      ]
+    },
+    "risk": {
+      "none": [],
+      "contract": [
+        "adr",
+        "anti"
+      ],
+      "data": [
+        "adr",
+        "anti",
+        "evidence",
+        "capacity"
+      ]
+    },
+    "scale": {
+      "tiny": [],
+      "small": [
+        "capacity"
+      ],
+      "medium": [
+        "capacity"
+      ],
+      "large": [
+        "capacity",
+        "evidence"
+      ]
+    },
+    "agency": {
+      "human": [],
+      "copilot": [],
+      "agent": [
+        "relay"
+      ]
+    }
+  },
+  "artifacts": [
+    {
+      "id": "coldstart",
+      "name": "冷启动三件 + 字节门",
+      "kind": "copy",
+      "files": [
+        "kit/templates/CLAUDE.md.template",
+        "kit/templates/WORKSPACE-NOTES.md.template",
+        "kit/templates/docs-README.md.template",
+        "kit/templates/kit.config.json.template",
+        "kit/scripts/cold-start-size.mjs"
+      ],
+      "prevents": "每会话从零找料；冷启动面无限增长且没人知道余量",
+      "accept": "node scripts/cold-start-size.mjs → OK（余量 ≥ 2048 B）",
+      "enforcement": "gate",
+      "to_enable_when": "永远启用（任何项目）"
+    },
+    {
+      "id": "agency",
+      "name": "分权表（T1 全自动 / T2 触发 / T3 人裁决）",
+      "kind": "guide",
+      "files": [],
+      "recipe": "在入口壳写一节「分权」：哪些事 AI 直接做、哪些先报备、哪些必须人拍板（判据 = 别人照着做的动作会不会变）",
+      "prevents": "AI 越权改契约；或人肉审每一条细节导致放弃",
+      "accept": "人工：拿 3 个真实待办各问一句「它属于 T1/T2/T3」，能秒答",
+      "enforcement": "doc",
+      "to_enable_when": "永远启用"
+    },
+    {
+      "id": "intake",
+      "name": "接入记录 INTAKE.md",
+      "kind": "copy",
+      "files": [
+        "kit/templates/INTAKE.md.template"
+      ],
+      "prevents": "半年后没人知道「为什么这里只有 3 个文件」；也不知道什么时候该加件",
+      "accept": "文件存在且 ≤60 行，五个段齐全（轴 / 装了 / 不装 + 触发 / 验收 / 复审）",
+      "enforcement": "doc",
+      "to_enable_when": "永远启用"
+    },
+    {
+      "id": "capacity",
+      "name": "容量档位声明（提示级）",
+      "kind": "guide",
+      "files": [],
+      "recipe": "在 kit.config.json 填 tiersByDir + maxLines，并在入口壳写一句「超过就拆，不拆要写理由」",
+      "prevents": "单个文档长到整读不完，而没人发现（假读全）",
+      "accept": "人工：抽最大的文件问「它属于哪一档」，能秒答；超限有没有处置办法",
+      "enforcement": "advisory",
+      "to_enable_when": "文档数 ≥ 20 或单文件 ≥ 40 KiB 时升级为门禁（kit 的 check-kit 或 check-caps）"
+    },
+    {
+      "id": "closeout",
+      "name": "收尾清单",
+      "kind": "copy",
+      "files": [
+        "kit/templates/CLOSEOUT.md.template",
+        "kit/templates/closeout-todo.md.template"
+      ],
+      "recipe": "拷收尾清单骨架（五步：报备 / 写回真源 / 门禁 / 归档与版本 / 汇报）+ 收尾登记面（A 写回面 / B 门禁 / C 归档 / D 版本 tag / E 体检 / Z 核销表）；按 P-26 裁到 0 处",
+      "prevents": "跨会话失忆：下次开工不知道上次做到了哪、为什么停",
+      "accept": "人工：跑一遍五步 ≤5 分钟；登记面 Z 表逐段打勾",
+      "enforcement": "doc",
+      "to_enable_when": "会开第二个会话时（horizon ≥ weeks）"
+    },
+    {
+      "id": "relay",
+      "name": "接力面（handoff + 台账 + 分权）",
+      "kind": "copy",
+      "files": [
+        "kit/templates/hook.md.template",
+        "kit/templates/prompt.md.template",
+        "kit/templates/report.md.template",
+        "kit/templates/ledger.md.template",
+        "kit/templates/relay-playbook.md.template"
+      ],
+      "recipe": "拷四件接力骨架（handoff / 派发 / 回传 / 台账）+ 稳定层手册；按 P-26 裁到 0 处（没有的字段删整行）。单会话项目可只拷台账。",
+      "prevents": "交接靠口口相传；两个会话同时改同一处",
+      "accept": "人工：让一个没参与过的会话只读 handoff 开工，问 3 个问题能答上来；台账 §1 每轮末行 == 本轮",
+      "enforcement": "doc",
+      "to_enable_when": "出现第 3 个会话、或第二个参与者、或要跨天续做"
+    },
+    {
+      "id": "evidence",
+      "name": "证据地图（每条规则指回源头）",
+      "kind": "guide",
+      "files": [],
+      "recipe": "一表六列：条目 / 源 / 基线版本 / 路径 + 节 / 引文 / 复核月；跨仓路径写 `src` + 冒号前缀",
+      "prevents": "规则说不出出处 → 半年后被当教条照做（或随手改掉）",
+      "accept": "人工：随机抽 3 条规则，能在 1 分钟内指到它的出处",
+      "enforcement": "doc",
+      "to_enable_when": "规则条数 ≥ 10，或要交给别人维护"
+    },
+    {
+      "id": "anti",
+      "name": "反例层（A-NN）",
+      "kind": "guide",
+      "files": [],
+      "recipe": "每条四段：现象（带日期与数字）/ 根因 / 正解（指回哪条规则）/ 怎么早发现",
+      "prevents": "同一种错重复犯；正面规则被读成口号",
+      "accept": "人工：每条反例都能说出「它防的是哪条规则的哪种失效」",
+      "enforcement": "doc",
+      "to_enable_when": "同一个坑犯第二次时"
+    },
+    {
+      "id": "adr",
+      "name": "决策记录（ADR）",
+      "kind": "guide",
+      "files": [],
+      "recipe": "背景 / 备选（含被否的）/ 裁定 / 理由 / 影响；一条决策一个文件",
+      "prevents": "不可逆决定没人记得为什么；半年后重开已否方案",
+      "accept": "人工：每个不可逆决定都能在 2 分钟内找到「当时否掉了什么」",
+      "enforcement": "doc",
+      "to_enable_when": "出现第一个不可逆决定（发布 / 对外契约 / 数据格式 / 依赖选型）"
+    },
+    {
+      "id": "progress",
+      "name": "进程记录两件（决策跟踪面 + 收尾登记面）",
+      "kind": "copy",
+      "files": [
+        "kit/templates/grill-decisions.md.template",
+        "kit/templates/closeout-todo.md.template"
+      ],
+      "prevents": "多轮决策散在对话里没人记得「当时否掉了什么」；收尾项靠记忆，漏了不报错",
+      "accept": "人工：本轮任一决策能在决策表里找到「候选 + 裁定 + 影响面」；收尾登记面 Z 表逐段打勾",
+      "enforcement": "doc",
+      "to_enable_when": "一轮内 ≥2 个待裁问题；或收尾有 ≥3 项要延后"
+    },
+    {
+      "id": "workflow",
+      "name": "会话流程 + 坑索引 + 变更日志",
+      "kind": "copy",
+      "files": [
+        "kit/templates/session-workflow.md.template",
+        "kit/templates/PITFALLS.md.template",
+        "kit/templates/CHANGELOG.md.template",
+        "kit/templates/acceptance.md.template",
+        "kit/templates/session-prompts.md.template"
+      ],
+      "prevents": "「会话怎么跑」只存在于某个人的习惯里；踩过的坑没人记；交付口径无法证伪",
+      "accept": "人工：新会话按 session-workflow §1 能自己开面；两段提示词能原样粘贴且无残留占位符；PITFALLS 至少一条带日期与数字；CHANGELOG 顶部 == VERSION",
+      "enforcement": "doc",
+      "to_enable_when": "永远启用（任何项目都要有「会话怎么跑」；relay-playbook / acceptance 按需，没有就删）"
+    }
+  ]
+}

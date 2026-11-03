@@ -1,0 +1,54 @@
+{
+  "profile": "lite",
+  "probes": {
+    "evidenceRow": false
+  },
+  "coldStart": {
+    "files": [
+      "README.md"
+    ],
+    "limitBytes": 32768,
+    "forceArchiveMarginBytes": 2048
+  },
+  "capacityTiers": {
+    "default": "readyThrough",
+    "tiersByDir": {
+      "docs/": "onDemand"
+    },
+    "readyThrough": {
+      "limitBytes": 51200,
+      "warnBytes": 40960
+    },
+    "onDemand": {
+      "limitBytes": 102400
+    },
+    "indexList": {
+      "limitBytes": 153600
+    },
+    "drawer": {
+      "limitBytes": null
+    },
+    "capBytes": 153600,
+    "maxLines": 2000,
+    "maxLineChars": 2000
+  },
+  "sectionRead": {
+    "thresholdBytes": 51200,
+    "marker": "按节读"
+  },
+  "quotas": {
+    "l0MaxEntries": 40,
+    "inboxMaxEntries": 50
+  },
+  "perVolumeLimitBytes": 20480,
+  "baseline": {
+    "path": ".kit-baseline.json"
+  },
+  "pathRoots": [],
+  "idPrefixes": {
+    "principle": "P-",
+    "antiPattern": "A-",
+    "evidence": "E-",
+    "adr": "ADR-"
+  }
+}

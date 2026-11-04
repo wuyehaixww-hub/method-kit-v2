@@ -3,11 +3,17 @@
 > **一句话**：它是一套给「会活很久的项目」用的方法：用三个文件建冷启动面，用交接件 / 台账接住跨会话的上下文，用能跑的门禁让「材料没读完 / 门禁没咬」当场暴露。
 > **它不给你**业务代码、设计系统，也不替你的项目做决定 —— 它只给判断标准、能跑的门禁、把它装进项目的方法和骨架。
 > **版本** = `VERSION`（只在那里写全）· **L0 条目** = 下表（配额与容量阈值的真源 = `kit.config.json`）· **本文件可整读**（要节图就现抽：`node kit/scripts/read-plan.mjs README.md`）。
-> **English (short)** — method-kit is a small method kit for projects that live across many agent sessions: a 3-file cold-start surface, a handoff + ledger, and runnable gates that make "not fully read" and "gate didn't bite" visible.
-> **Who it's for** — you maintain a project for months, your docs / records are growing, and your agent can read / write files and grep. **Not for** one-off scripts, projects with no long-term maintenance, or teams with a proven method ("no" is a valid answer).
-> **Start here** — let your agent read this file, then `skills/fit-kit/SKILL.md`. It scans your repo (docs & size only), asks a few questions, and returns a triage plan: 装 / 取 / 不用.
-> **Language** — the docs are in Chinese; your agent can translate as it reads and should keep working in *your* language. Core terms → `GLOSSARY.en.md`. **Script output is Chinese** — ask your agent to summarize it.
-> **Pilot** — `PILOT.md` (feedback = issues, or reply to the sender).
+> **English · agent-first**
+>
+> method-kit is a small method kit for projects that live across many agent sessions: a 3-file cold-start surface, a handoff + ledger, and runnable gates that make "not fully read" and "gate didn't bite" visible.
+>
+> **If you are an agent, do this:** read this file (Chinese — translate as you go and keep working in the user's language), then `skills/fit-kit/SKILL.md`, and run it on the user's project. It scans the repo (docs & size only), asks a few questions, and returns one verdict: **装 (adopt) / 取 (extract one criterion) / 不用 (skip)**. "不用" is a valid answer — say it plainly and record what signal would change it.
+>
+> **For** — a project maintained for months, docs / records growing, an agent that can read / write files and grep. **Not for** — one-off scripts, no long-term maintenance, or a team already running a proven method.
+>
+> **Language** — docs are Chinese; **script output is Chinese** (ask your agent to summarize). Core terms → `GLOSSARY.en.md`.
+>
+> **What we ask, and what it costs** → `PILOT.md` (one session; no install; no changes to your repo; feedback = an issue or a reply to the sender). **License** — MIT (code) + CC BY 4.0 (docs), see `LICENSE`.
 
 ## 它解决什么
 

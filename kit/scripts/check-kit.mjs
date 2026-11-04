@@ -293,6 +293,36 @@ for (const [p, t] of txt) {
   }
 }
 
+// —— 探针 14：册号跨三目录一致（principles/ · anti-patterns/ · evidence/ 同名同号）
+// 编号 = 14：台账 §5 的「候选探针 13」（handoff 五段）仍占 13 号，别再撞。
+// 判两件事：① 文件名 NN 与首行「· NN 」一致；② 同一 slug 在三目录里必须是同一个号、同一号必须是同一个 slug。
+// 为什么：B2b-7 真出过 01/05 同名两号（牵 28 处 / 9 文件），当时只统一了数据、没加门。
+const VOL_DIRS = ["principles", "anti-patterns", "evidence"];
+const slugNums = new Map(); // slug -> Map<num, Set<dir>>
+const numSlugs = new Map(); // num -> Map<slug, Set<dir>>
+for (const dir of VOL_DIRS) {
+  const d = join(ROOT, dir);
+  if (!existsSync(d)) continue;
+  for (const e of readdirSync(d, { withFileTypes: true })) {
+    if (!e.isFile() || !e.name.endsWith(".md")) continue;
+    const fm = e.name.match(/^(\d{2})-(.+)\.md$/);
+    if (!fm) continue;
+    const num = fm[1], slug = fm[2];
+    const head = (readFileSync(join(d, e.name), "utf8").split(/\r?\n/).find((l) => l.startsWith("# ")) || "");
+    const hm = head.match(/·\s*(\d{2})\s/);
+    if (!hm) fails.push("册首无册号 " + dir + "/" + e.name + "（探针 14）");
+    else if (hm[1] !== num) fails.push("册号与首行不一致 " + dir + "/" + e.name + " 文件名 " + num + " ≠ 首行 " + hm[1] + "（探针 14）");
+    if (!slugNums.has(slug)) slugNums.set(slug, new Map());
+    if (!slugNums.get(slug).has(num)) slugNums.get(slug).set(num, new Set());
+    slugNums.get(slug).get(num).add(dir);
+    if (!numSlugs.has(num)) numSlugs.set(num, new Map());
+    if (!numSlugs.get(num).has(slug)) numSlugs.get(num).set(slug, new Set());
+    numSlugs.get(num).get(slug).add(dir);
+  }
+}
+for (const [slug, nums] of slugNums) if (nums.size > 1) fails.push("同名册号不一致 " + slug + "：" + [...nums.keys()].join(" / ") + "（探针 14）");
+for (const [num, slugs] of numSlugs) if (slugs.size > 1) fails.push("同号不同名 " + num + "：" + [...slugs.keys()].join(" / ") + "（探针 14）");
+
 if (frozenSet.size) console.log("[check-kit] 存量冻结 " + frozenSet.size + " 个（欠账，非合法；--update-baseline 可重建）");
 for (const w of warns) console.log("[check-kit] WARN " + w);
 for (const f of fails) console.error("[check-kit] FAIL " + f);

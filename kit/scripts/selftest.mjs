@@ -197,6 +197,13 @@ const CASES = [
     mkdirSync(join(d, "_trim"), { recursive: true });
     writeFileSync(join(d, "_trim", "INTAKE.md"), "# INTAKE\n\n## 4. 验收\n\n```\nnode scripts/cold-start-size.mjs\n```\n", "utf8");
   }, false, ["--root", "_trim", "INTAKE.md"]],
+  // 探针 14 的独立注入态：只改首行册号（不动文件名 → 不连带死链探针），应只由「册号与首行不一致」红
+  ["volume-number-mismatch", 1, "check-kit.mjs", (d) => rewrite(join(d, "anti-patterns", "05-intake.md"), (t) => t.replace("· 05 ", "· 06 ")), true],
+  // 探针 10 的 inbox 分支（此前只有一次性夹具、无常驻态）：inbox 现 1 份 README + 51 份 → 52 > 50
+  ["inbox-quota-exceeded", 1, "check-kit.mjs", (d) => {
+    mkdirSync(join(d, "inbox"), { recursive: true });
+    for (let i = 0; i < 51; i++) writeFileSync(join(d, "inbox", "x" + i + ".md"), "# x\n", "utf8");
+  }, true],
 ];
 
 let bad = 0;

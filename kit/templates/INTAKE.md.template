@@ -11,10 +11,8 @@
 |---|---|---|
 | horizon 寿命 | <oneoff / weeks / long> | <用户原话，或扫描事实> |
 | risk 风险面 | <none / contract / data> | <最怕的坏结果> |
-| scale 体量 | <tiny / small / medium / large> | <扫描器实测：文件 N / 文档 M> |
+| scale 体量 | <tiny / small / medium / large> · <绿地 / 既有> | <扫描器实测：文件 N / 文档 M；状态判据 = adopt-kit 第 0 步> |
 | agency 谁拍板 | <human / copilot / agent> | <用户原话> |
-
-**项目状态**：<绿地 / 既有>（判据 = adopt-kit 协议的第 0 步）
 
 **决策权表**（`agency` 只是默认档；逐流程填，写不出实例的行就删）：
 
@@ -31,10 +29,10 @@
 **用词**：kit 的叫法 → 本项目叫它（例：`收尾` → `会话末同步`）；**编号不进正文**（留出处就写一行「依据：method-kit P-xx」）。
 ## 2. 装了（每行必须写「防的是哪种坏结果」；写不出就删掉这行）
 
-| 件 | 形态 | 防的是什么 | 验收 |
-|---|---|---|---|
-| coldstart | copy | 每会话从零找料 | `node scripts/cold-start-size.mjs` → OK |
-| <件 id> | copy / guide | <坏结果> | <命令或人工判据> |
+| 件 | 形态 | 防的是什么 | 验收 | 取值 / 为什么 |
+|---|---|---|---|---|
+| coldstart | copy | 每会话从零找料 | `node scripts/cold-start-size.mjs` → OK | 三件 = `<A>/<B>/<C>` B；`limitBytes` = `<Y>` B；推荐 = `<Z>` KiB；为什么 = `<一句话>` |
+| <件 id> | copy / guide | <坏结果> | <命令或人工判据> | — |
 
 ## 3. 不装（**不是否定，是延后**）
 

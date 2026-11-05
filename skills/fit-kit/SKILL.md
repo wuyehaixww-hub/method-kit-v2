@@ -164,7 +164,7 @@ description: Use when someone has just got method-kit and has to decide whether 
 - 用哪几条（引 `P-NN` 前读过原文）/ 装哪几件
 - 与已有方法的重复 / 冲突（有则列）
 - 下一步：谁做、第一件事
-- **装后多出的固定成本**（装 / 取 才写）：每次开工多读几份 / 多少字节、每次收尾多一张什么表
+- **装后多出的固定成本**（装 / 取 才写）：每次开工多读几份 / 多少字节（**材料字节，不是 GUI token**；口径见 `skills/coldstart-intake/SKILL.md` 的「按需估算」附录）、每次收尾多一张什么表
 - 复审：日期或触发条件
 - 没问到的 / 猜的（留白，`P-14`）
 

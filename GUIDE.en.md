@@ -73,6 +73,8 @@ In three moves:
 
 **That gate** (a byte-sum ceiling + a forced-archive line) is not there to shrink files — it is there to **expose when the extraction was not done well**. "Please keep it lean" with no gate is the same as nothing (`P-01`).
 
+**Governance cost grows with the project**: the longer it lives, the more files it has, the bigger it gets, the more it costs just to keep the next session able to start; large projects especially — **not linearly**, and the task and phase matter too. There is no fixed estimate here; ask for a specific number on demand (the count = **the three files + the handoff §2 required list + supplementary reads**, in **material bytes, not GUI tokens**; see the "estimate on request" appendix in `skills/coldstart-intake/SKILL.md`), and **do not report it every round**.
+
 **Criteria**: `P-01`..`P-05` in the intake volume. **How to build it**: `skills/coldstart-intake/SKILL.md` (**six steps**: config → surface → gate → ladder → the two session prompts → the spot check).
 
 ## 五、The three layers of reading

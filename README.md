@@ -11,7 +11,8 @@
 >
 > **For** — a project maintained for months, docs / records growing, an agent that can read / write files and grep. **Not for** — one-off scripts, no long-term maintenance, or a team already running a proven method.
 >
-> **Language** — docs are Chinese; **script output is Chinese** (ask your agent to summarize). Core terms → `GLOSSARY.en.md`.
+> **Language** — docs are Chinese; the **read path** (`README` / `GUIDE` / `fit-kit`) also exists in English → `README.en.md`, plus `GUIDE.en.md` and `SKILL.en.md` (the latter under `skills/fit-kit/`). **Script output is Chinese** (ask your agent to summarize). Core terms → `GLOSSARY.en.md`.
+> **It does not promise "close enough"** — what it guarantees is that *"the material is not enough" gets caught on the spot*. (Same sentence as the Chinese section below.)
 >
 > **What we ask, and what it costs** → `PILOT.md` (one session; no install; no changes to your repo; feedback = an issue or a reply to the sender). **License** — MIT (code) + CC BY 4.0 (docs), see `LICENSE`.
 
@@ -37,10 +38,13 @@ method-kit 只做一件事：**让下一个会话用最少的材料直接开工�
 
 **先说「什么时候别用」**：一两个人的一次性脚本、没有长期维护打算、或者已经有一套被验证在跑的规矩 —— 这套大概率是负担。`skills/fit-kit/SKILL.md` 会直说「不用」，并写下**什么信号出现时再来**。
 
-**两条来路（先看你在哪一边）**：
+**它不保证「八九不离十」**：它保证的是「材料不够用」当场可被发现；能不能长期跑下去，取决于你的项目本身、以及你愿不愿意维护那张面。
+
+**三条来路（先看你在哪一边）**：
 
 - **你手上有个项目，想知道这套东西适不适合、该用哪几条** → 让 agent 读 `skills/fit-kit/SKILL.md` 按它走。它会先扫你的仓（只看规则文档与体量），再问六个问题，最后给一份**适配计划**；不合适时会直接说「你现在不需要这套」。
 - **你已经在这个仓里干活（入口壳已注入）** → 同样先走 `skills/fit-kit/SKILL.md` 的第 0 步：它只问**一句**（维护这个包 / 用它进你的项目），答「维护」时它先看包里有没有维护者层件：**有**就走它，**没有**（发布件）→ 包内不可改；fork 后自建流程（上游暂不公开）；只想查条目也可以直接看 §L0 地图。
+- **你只是想知道这套在讲什么、暂时不装** → 读 `GUIDE.md` 的 §一 / §四 / §九（约 30 行）：三个事实、一次取舍、什么时候别用。不装也能读完，不用改你的仓。
 
 **这是 pilot**：参与方式 / 反馈什么 → `PILOT.md`（`-dev`；不承诺稳定）。
 
@@ -95,6 +99,7 @@ method-kit 只做一件事：**让下一个会话用最少的材料直接开工�
 | P-30 | **「读全」要可证**：引用了内容 ⇒ 拿得出完整覆盖的读记录；只读一部分要写清读了哪节、影响什么 | 05 取料 |
 | P-31 | **去重 = 迁移 + 至少一条可达指针**：删前逐指针审计，禁「删掉就没」 | 02 收尾 |
 | P-32 | 拆卷前先答四问；按读者切，路由页不是最大件；冷启动面永不拆 | 05 取料 |
+| P-33 | 归档完成条件：四条全齐才算搬完（逐字 / 墓碑 + 指针 / 索引登记 / 记尺寸） | 02 收尾 |
 
 ## 兼容承诺
 
@@ -124,6 +129,6 @@ method-kit 只做一件事：**让下一个会话用最少的材料直接开工�
 - **维护这个包** → 你手上的是**发布件**：包内不可改（改了下次重建会被冲掉）。要改请 fork 后自建维护流程（上游暂不公开）—— 分权 / 收尾 / 落点表这类动作层文件不随包分发。
 - **接手先跑一次门禁**：`node kit/scripts/check-kit.mjs` + `node kit/scripts/cold-start-size.mjs`（都只读），看当前状态再动手。
 - 本文件就是本包的冷启动面（真源 = `kit.config.json` → `coldStart.files`）：**写它就是花冷启动预算**，加段前先算字节。
-- **改首屏 = 两处同改**：中文 pitch 与顶部英文摘要是同一件事的两个视图；同时改，别只改一处。
+- **改首屏 = 三处同改**：中文 pitch、顶部英文摘要、`README.en.md` 是同一件事的三个视图；同时改，别只改一处。
 - 改任何阈值 / 档位 / 配额：**只改 `kit.config.json`**，再跑 `node kit/scripts/check-kit.mjs`。文档只写指针，不复述数值。
 - **许可 / 第三方声明** → `LICENSE`（MIT 代码 / 配置（含 *.json.template）+ CC BY 4.0 文档 / *.md.template）· `CREDITS.md`（Matt Pocock MIT）。

@@ -39,6 +39,7 @@ description: Use when a new (greenfield) or existing project has to be fitted wi
 4. **建面 + 记录**：装 `copy` 类件（照 plan 的「拷」行）。**copy 件 = 照抄再裁剪**（merge 与改写都不算 copy；三条动作与判据 = `coldstart-intake` 第 1 步，`INTAKE.md` 与冷启动三件同样适用）；`guide` 类件按 plan 的「做」行动手写 3–5 行。然后填 `kit/templates/INTAKE.md.template` → 目标项目的 `INTAKE.md`（**含决策权表与术语**；绿地另写「第一周交付物」），并在 `WORKSPACE-NOTES.md` 的「当前状态」里加一行指向它。建冷启动面时调 `coldstart-intake`（不在此重复它的步骤）。 **装了 `progress` 类件时**：把 `kit/templates/grill-decisions.md.template` 与 `kit/templates/closeout-todo.md.template` 拷进目标项目的记录区，并把「什么时候写」写进入口壳 —— 一轮里有 ≥2 个待裁问题 → 决策面；收尾有 ≥3 项要延后 → 登记面。
    **源不在手边时**：`copy` 件的模板 / 脚本没拷过来就是没有 —— **不许手写替身**（那就不是 copy 件了）。标「未落地 + 缺哪几个文件」，写进 INTAKE 的验收列，**别留空、也别假装装上了**。
 5. **验收 + 复审**：逐件跑 plan 给的「验收」；人工判据那几件，当场问一句就能答 = 通过。把复审触发抄进 INTAKE `§5`。
+   **装完告诉用户「发生了什么变化」**（事实，不做评分 —— 好坏由他判、由时间判）：新增了哪几件 / 每次开工固定多读几份（**逐份清单**，不是只报总数）、多少字节 / 每次收尾多一张什么表。**装前不强制取基线**：多数项目装前没有可比的口径（没有三件、没有门禁、没有收尾动作），硬取会得到一串「不适用」。
 
 ## 开放轮 7 问（每题带「我为什么问」与「跳过时的默认」）
 
@@ -68,6 +69,7 @@ description: Use when a new (greenfield) or existing project has to be fitted wi
 
 **默认值从 `agency` 推**：`human` → 大多「你跑」，AI 只提议；`copilot` → 默认「AI 提议你批」，纯机械项（跑门禁 / 自测 / 计数）「AI 跑」；`agent` → 默认「AI 跑 + 事后抽查」。
 **三条不可放宽（[硬]）**：发布点 · 删结构（含**退役 / 合并**）· 改对外契约 —— **与 agency 无关，永远「你跑」**。理由：这三件不可逆，而「不可逆」不随你放权程度变化；把它写进表，是为了让「AI 能自己发版」这种默认**根本没机会形成**。
+**判不出时怎么办**（不懂工程的人一定会遇到）：别问他「这算不算改对外契约」——先让 agent 用一句人话说清「**谁会受影响、这个影响可不可逆**」，再让他点头。**判不出 ≠ 可以放行**；也不许替他判。
 **减法**：写不出「**本会话或第一周内**能指认的一个具体动作」的流程 → **删掉那行**。表不是清单，删行比填满重要。
 **但三条固定行不受减法约束**：它们在第一天本来就常常没有实例（正因为如此才要写死）—— 按字面删掉，这条硬约束就失去了落点。无实例时保留行 + 标「长期不触发」。
 
@@ -97,5 +99,5 @@ description: Use when a new (greenfield) or existing project has to be fitted wi
 - 不替用户做价值判断（「收不收」是他的事，你只给成本与后果）。
 - 不装 `check-kit` 到目标项目（它需要 `principles/` 与 README 地图；目标项目只装 `cold-start-size`）。
 - 不复制 kit 的正文到目标项目（复制 = 第二份会腐烂的副本；只复制模板与脚本）。
-- 不在本 skill 里重做 `coldstart-intake` 的四步（它是本流程第 4 步里的一步）。
+- 不在本 skill 里重做 `coldstart-intake` 的六步（它是本流程第 4 步里的一步）。
 - **不和 `skills/extract-kit/SKILL.md` 抢「取一条」**：装 = 建整套薄面；取 = 只拿一条判据进已有体系。分不清时先问一句「这项目有没有自己的体系」。

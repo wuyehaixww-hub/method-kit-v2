@@ -11,7 +11,7 @@ description: Use when a new project needs its cold-start surface (entry shell / 
 - 工作区已存在，但 agent 每会话都要翻目录找料、或读一堆历史件。
 - 冷启动总量涨到撞门，或**没人知道余量还剩多少**。
 
-## 五步
+## 六步
 
 0. **建配置**：拷 `kit/templates/kit.config.json.template` → `<项目>/kit.config.json`（严格 JSON，直接可用）。**注意**：JSON 模板里**不能写注释** —— 这份模板的「怎么用」（每个键管什么、哪些可删）写在**本步**与 `GUIDE.md` §八，不在文件里。**先有它，脚本才认得出仓根**（向上找配置，遇 `.git` 即停）。
    **拷完先裁**：整套照抄 = 目标项目永远用不上的噪声。**只留 `coldStart`**；**要跑 `check-kit`（第 3 步的容量判定）时**按模板补回 `capacityTiers` / `sectionRead` / `quotas`（缺任一段它会 `exit 2` 并点名缺哪段），跑完可再裁掉；`profile` / `baseline` / `pathRoots` / `idPrefixes` / `perVolumeLimitBytes` 不装 `check-kit` 就删。判据 = **逐个删键后 `node kit/scripts/cold-start-size.mjs --root .` 仍 `OK` ⇒ 该键对本项目可删**；删到「再删就红」= 最小面。**但 `coldStart` 里的 `files` / `limitBytes` / `forceArchiveMarginBytes` 不许删** —— 它们就是这道门本身（缺了它现在会 `exit 2`，别把它当噪声删掉）。**裁掉的键要登记进 `WORKSPACE-NOTES.md` 的「已知边界」行**（没有就建一条；将来跑 full profile 时要补回）。
@@ -23,6 +23,8 @@ description: Use when a new project needs its cold-start surface (entry shell / 
    **文档在长 / 单份读不完** → `skills/doc-governance/SKILL.md`（测读上限 + 按 `P-32` 四问；阈值仍只写 `kit.config.json`）。
 4. **交付两段提示词**：拷 `kit/templates/session-prompts.md.template` → 本项目，按它的「生成规则」把 `<…>` 全部填成**本项目真实值**（入口件 / 交接件目录 / 门禁命令 / 有无 remote / harness 能力），再按 §四自检。
    **这两段是用户每天真正要用的东西** —— 不交付它，前三步建的面用户根本不会用（面是给 agent 的，提示词是给人的）。落盘建议：与 `session-workflow.md` 放一起（同一份事实的两个视图，改一处记得改另一处）。
+5. **抽检（改过 / 装过三件之后做一次，不是每棒）**：只看三件、5 分钟内答三题 —— ① **入口壳**：哪些事必须先问用户、哪些不能自己改？② **当前状态**：现在到哪了、下一棒做什么、第一读哪份？③ **索引**：某个目录 / 某条规则该去哪份看？**每题必须答出「在哪个文件的哪一行」**；答「去某份查」也算对，只要指得到。答不出 = 那一件没尽职责（哪怕字节达标），回第 1 步补，补完再答一次。
+   **这与字节门量的是两件事**：字节门量「第一屏多大」，抽检量「第一屏还装着它该装的东西吗」。**注入态（证明它会咬）**：把 `WORKSPACE-NOTES.md` 当前状态段的「版本 / 下一棒 / 当前第一读」**三行一起删** → 第 ② 题三个子句全答不出（只删一行不够）。**模板注意**：`WORKSPACE-NOTES.md.template` 用的是「下一会话」不是「下一棒」，注入时按实际标题找。
 
 ## 反例
 

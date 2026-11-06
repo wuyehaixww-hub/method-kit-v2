@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// check-kit.mjs — 本方法仓文档 / 条目 / 容量门禁（12 条探针；阈值全部读 kit.config.json）
+// check-kit.mjs — 本方法仓文档 / 条目 / 容量门禁（13 条探针：编号 1–12 + 14；阈值全部读 kit.config.json）
 // 用法: node kit/scripts/check-kit.mjs [--root <dir>] [--profile=lite|full] [--update-baseline]
 // 退出码: 0 = 通过 / 1 = 有 FAIL / 2 = 环境错误（找不到或读不懂 kit.config.json）
 //
@@ -15,9 +15,10 @@
 //   9) 删 principles/ 某条的 「> 证据：」 行  → 探针 12（条目可复核）
 //  10) 往 session-notes/ 放一个 > sectionRead.thresholdBytes、但仍 < 该档上限的 .md（不带「按节读」）→ 探针 7（oversize-volume 会连带触 3，这个只触 7）
 //  11) 删掉某条 `## A-NN` 里所有 `P-NN` 指针（或「怎么早发现」行）→ 探针 12 的 A 侧（2026-10-31 补）
-// 以上 11 条 + cold-start 五态是**核心配方**；完整态清单以 selftest.mjs 的 CASES 为准（探针 3 / 5 / 7 / 12 另有专属态）。
-// 隔离态：探针 3 = oversize-ondemand · 探针 7 = section-read-missing（2026-10-31）· 探针 12 = missing-evidence（P 侧）/ antipattern-unlinked（A 侧，2026-10-31）/ evidence-row-off（配置关闭态，2026-11-02）；探针 4 仍缺（与探针 2 面重叠，登记 = session-notes/rollout-ledger.md §5）。
-//  12) kit.config.json 的 probes.evidenceRow 置 false + 删 principles/ 某条「> 证据：」→ 探针 12 的 P 侧应**不**报（= selftest 的 evidence-row-off；默认 true 时同一注入必红 = missing-evidence）
+//  12) 在任一 .md 里写一个三反引号围栏块（或未闭合围栏 / ~~~）、再写一条死链（如 `kit/scripts/nope.md`）→ 探针 5（逐行配对，围栏不再吞链，2026-11-06 补）
+//  13) kit.config.json 的 probes.evidenceRow 置 false + 删 principles/ 某条「> 证据：」→ 探针 12 的 P 侧应**不**报（= selftest 的 evidence-row-off；默认 true 时同一注入必红 = missing-evidence）
+// 以上各条 + cold-start 五态是**核心配方**；完整态清单以 selftest.mjs 的 CASES 为准（探针 3 / 5 / 7 / 12 另有专属态）。
+// 隔离态：探针 3 = oversize-ondemand · 探针 5 = fence-deadlink / stray-tick-deadlink / unclosed-fence-deadlink / tilde-fence-deadlink（2026-11-06）· 探针 7 = section-read-missing（2026-10-31）· 探针 12 = missing-evidence（P 侧）/ antipattern-unlinked（A 侧，2026-10-31）/ evidence-row-off（配置关闭态，2026-11-02）；探针 4 仍缺（与探针 2 面重叠，登记 = session-notes/rollout-ledger.md §5）。
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { join, resolve, dirname, relative, extname, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -161,6 +162,10 @@ if (changelog == null) {
 }
 
 // —— 探针 5：死链（反引号内带 / 的 .md 相对路径；跨仓指针（`src` + 冒号）/ 盘符绝对路径 / 含占位符的跳过）
+// 历史盲区（2026-11-05 三组对照实测；2026-11-06 B3-7 修）：按**整份文件**配对时，围栏 / 落单反引号会让奇偶错位，
+// 其后的路径被吞进同一个 token → 静默漏检（同一段路径：无围栏的文件红、有围栏的绿）。
+// 修法 = **逐行配对**（行内代码不跨行）：一行里的反引号配不上，最多弄坏这一行；围栏行不再参与全局配对。
+// 语义不变：仍只查「带 /、首段是真实顶层目录」的 .md 路径；代价 = 围栏内的路径也进候选（代码示例请用占位符）。
 const TICKED = /`([^`]+)`/g;
 // 只查「首段是真实顶层目录」的路径：命令示例（如 `node kit/scripts/x.mjs y.md`）首段是 node → 跳过；
 // 而 `prompt history/a b.md` 这类含空格 / 中文的本方法仓路径会进面（旧正则的盲区）。
@@ -168,15 +173,17 @@ const pathRoots = new Set(readdirSync(ROOT, { withFileTypes: true }).filter((e) 
 for (const r of cfg.pathRoots || []) pathRoots.add(r);
 const badLinks = new Set();
 for (const [p, t] of txt) {
-  for (const m of t.matchAll(TICKED)) {
-    const target = m[1].trim();
-    if (!target.endsWith(".md") || !target.includes("/")) continue;
-    if (!pathRoots.has(target.split("/")[0])) continue;
-    if (target.startsWith("src" + ":")) continue;
-    if (/^[A-Za-z]:[\\/]/.test(target)) continue;
-    if (target.includes("://")) continue;
-    if (/[<>*?{}|…]/.test(target)) continue;
-    if (!existsSync(join(ROOT, target))) badLinks.add("死链 " + target + " ← " + rel(p));
+  for (const line of t.split(/\r?\n/)) {
+    for (const m of line.matchAll(TICKED)) {
+      const target = m[1].trim();
+      if (!target.endsWith(".md") || !target.includes("/")) continue;
+      if (!pathRoots.has(target.split("/")[0])) continue;
+      if (target.startsWith("src" + ":")) continue;
+      if (/^[A-Za-z]:[\\/]/.test(target)) continue;
+      if (target.includes("://")) continue;
+      if (/[<>*?{}|…]/.test(target)) continue;
+      if (!existsSync(join(ROOT, target))) badLinks.add("死链 " + target + " ← " + rel(p));
+    }
   }
 }
 for (const s of badLinks) fails.push(s);

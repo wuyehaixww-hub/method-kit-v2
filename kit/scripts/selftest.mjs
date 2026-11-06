@@ -100,6 +100,13 @@ const CASES = [
   ["space-deadlink", 1, "check-kit.mjs", (d) => rewrite(join(d, "README.md"), (t) => t + "\n（对照）见 `kit/不存在 的文件.md`。\n"), true],
   // 命令示例不得被当路径（假阳性回归锁）
   ["command-not-path", 0, "check-kit.mjs", (d) => rewrite(join(d, "README.md"), (t) => t + "\n（对照）`node kit/scripts/read-plan.mjs README.md` 不算路径。\n"), true],
+  // 探针 5 的历史盲区（2026-11-05 三组对照 / 2026-11-06 改逐行配对）：围栏行与落单反引号会让「整份文件配对」错位，
+  // 其后的死链被吞进同一个 token → **静默漏检**。四态覆盖：成对围栏 / 落单反引号 / 未闭合围栏 / ~~~ 围栏。
+  ["fence-deadlink", 1, "check-kit.mjs", (d) => writeFileSync(join(d, "zz-probe5-fence.md"), "```text\n（代码示例）\n```\n\n（对照）见 `kit/scripts/nope-probe5.md`。\n"), true],
+  ["stray-tick-deadlink", 1, "check-kit.mjs", (d) => writeFileSync(join(d, "zz-probe5-tick.md"), "`\n\n（对照）见 `kit/scripts/nope-probe5.md`。\n"), true],
+  // 闭合围栏后再来一条落单围栏（2026-11-06 复核实测的形状）：整段散文不得被跳过
+  ["unclosed-fence-deadlink", 1, "check-kit.mjs", (d) => writeFileSync(join(d, "zz-probe5-unclosed.md"), "```text\n（已闭合块）\n```\n\n```\n\n（对照）见 `kit/scripts/nope-probe5.md`。\n"), true],
+  ["tilde-fence-deadlink", 1, "check-kit.mjs", (d) => writeFileSync(join(d, "zz-probe5-tilde.md"), "~~~text\n（围栏示例）\n~~~\n\n（对照）见 `kit/scripts/nope-probe5.md`。\n"), true],
   // lite profile：无 VERSION / CHANGELOG 也能绿（发布门降级为 WARN）
   ["lite-no-version", 0, "check-kit.mjs", (d) => { rmSync(join(d, "VERSION")); rmSync(join(d, "CHANGELOG.md"), { force: true }); }, true, ["--profile=lite"]],
   // 接入层：矩阵被改坏 / 轴值非法 / 最小档可跑

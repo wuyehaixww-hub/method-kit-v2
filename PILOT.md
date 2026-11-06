@@ -1,6 +1,6 @@
 # method-kit pilot
 
-> The package's docs are in Chinese; this pilot note is in English. A short English front matter is at the top of `README.md`; core terms are in `GLOSSARY.en.md`.
+> The method's docs are in Chinese; this pilot note is in English. The default README is English (`README.md`); the Chinese README is `README.zh.md`; core terms are in `GLOSSARY.en.md`.
 
 This is a pilot release of method-kit — a small method kit for projects that
 stay alive across many agent sessions.

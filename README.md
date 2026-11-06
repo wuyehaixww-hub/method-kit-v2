@@ -1,134 +1,130 @@
-# method-kit — 让长期项目的下一个会话直接开工
+# method-kit — so the next session on a long-lived project can start working immediately
 
-> **一句话**：它是一套给「会活很久的项目」用的方法：用三个文件建冷启动面，用交接件 / 台账接住跨会话的上下文，用能跑的门禁让「材料没读完 / 门禁没咬」当场暴露。
-> **它不给你**业务代码、设计系统，也不替你的项目做决定 —— 它只给判断标准、能跑的门禁、把它装进项目的方法和骨架。
-> **版本** = `VERSION`（只在那里写全）· **L0 条目** = 下表（配额与容量阈值的真源 = `kit.config.json`）· **本文件可整读**（要节图就现抽：`node kit/scripts/read-plan.mjs README.md`）。
-> **English · agent-first**
+> **English (default)** · [中文版 → README.zh.md](README.zh.md)
+> **This is the default README.** The method's criteria and the rest of the docs are Chinese; the Chinese README is `README.zh.md`. If this file and the Chinese method text disagree, the Chinese method text wins.
+> **One line**: a method for projects that live for a long time — three files for the cold-start surface, a handoff + ledger to carry context across sessions, and runnable gates that make "not fully read" and "the gate didn't bite" visible on the spot.
+> **It does not give you** business code, a design system, or decisions about your project — only judgment criteria, runnable gates, and the method + skeletons for installing it into your project.
+> **Version** = `VERSION` (written in full only there) · **L0 entries** = the table below (quotas and capacity thresholds live in `kit.config.json`) · **This file can be read whole** (for a section map: `node kit/scripts/read-plan.mjs README.md`).
 >
-> method-kit is a small method kit for projects that live across many agent sessions: a 3-file cold-start surface, a handoff + ledger, and runnable gates that make "not fully read" and "gate didn't bite" visible.
->
-> **If you are an agent, do this:** read this file (Chinese — translate as you go and keep working in the user's language), then `skills/fit-kit/SKILL.md`, and run it on the user's project. It scans the repo (docs & size only), asks a few questions, and returns one verdict: **装 (adopt) / 取 (extract one criterion) / 不用 (skip)**. "不用" is a valid answer — say it plainly and record what signal would change it.
+> **If you are an agent, do this:** read this file, then `skills/fit-kit/SKILL.md` (English: `skills/fit-kit/SKILL.en.md`), and run it on the user's project. It scans the repo (docs and size only), asks a few questions, and returns one verdict: **装 (adopt) / 取 (extract one criterion) / 不用 (skip)**. "不用" is a valid answer — say it plainly and record what signal would change it.
 >
 > **For** — a project maintained for months, docs / records growing, an agent that can read / write files and grep. **Not for** — one-off scripts, no long-term maintenance, or a team already running a proven method.
 >
-> **Language** — docs are Chinese; the **read path** (`README` / `GUIDE` / `fit-kit`) also exists in English → `README.en.md`, plus `GUIDE.en.md` and `SKILL.en.md` (the latter under `skills/fit-kit/`). **Script output is Chinese** (ask your agent to summarize). Core terms → `GLOSSARY.en.md`.
-> **It does not promise "close enough"** — what it guarantees is that *"the material is not enough" gets caught on the spot*. (Same sentence as the Chinese section below.)
->
-> **What we ask, and what it costs** → `PILOT.md` (one session; no install; no changes to your repo; feedback = an issue or a reply to the sender). **License** — MIT (code) + CC BY 4.0 (docs), see `LICENSE`.
+> **Language** — this README is English by default; the method docs (criteria, protocols) are Chinese and scripts output Chinese (ask your agent to summarize). English read path: this file + `GUIDE.en.md` + `skills/fit-kit/SKILL.en.md`; Chinese README → `README.zh.md`; core terms → `GLOSSARY.en.md`.
 
-## 它解决什么
+## What it solves
 
-三个事实同时成立时，失败不会报错：
+When three facts hold at the same time, failure stops announcing itself:
 
-- **上下文有限**：新会话读不完该读的，于是自己发明规矩；
-- **记录只会变长**：文档越写越多，没人知道哪份最新；
-- **门禁容易假绿**：脚本跑了，但没咬。
+- **Context is finite**: a new session cannot read everything it should, so it invents its own rules;
+- **Records only grow**: docs pile up and nobody knows which one is current;
+- **Gates go false-green**: the script ran, but it didn't bite.
 
-method-kit 只做一件事：**让下一个会话用最少的材料直接开工，并且让「材料不够用」可被发现。**
+method-kit does one thing: **let the next session start working with the least material — and make "the material is not enough" discoverable.**
 
-## 它给你什么
+## What you get
 
-- **判断标准**（`principles/`）：每条一个 `P-NN`，带反例与「怎么查」。
-- **能跑的门禁**（`kit/scripts/`）：零依赖 node，退出码 0 / 1 / 2；不靠「我保证」。
-- **装进项目的方法**（`skills/`）：`fit-kit` 先量你的仓，再判「装 / 取 / 不用」。
-- **文档体量治理**（`skills/doc-governance/`）：先量读上限，再逐份体检，按四问决定拆不拆。
-- **骨架**（`kit/templates/`）：冷启动三件、交接件、台账、收尾清单。
+- **Judgment criteria** (`principles/`): one `P-NN` each, with an anti-pattern and a "how to check".
+- **Runnable gates** (`kit/scripts/`): zero-dependency node, exit codes 0 / 1 / 2; not "trust me".
+- **A way to install it** (`skills/`): `fit-kit` measures your repo first, then decides 装 / 取 / 不用 (adopt / extract / skip).
+- **Document-size governance** (`skills/doc-governance/`): measure the read limit first, then examine file by file, and use four questions to decide whether to split.
+- **Skeletons** (`kit/templates/`): cold-start three, handoff, ledger, closeout checklist.
 
-**怎么跑** → `GUIDE.md`：六个产物 / 一次会话的时序 / 读的三层 / 工具能力假设 / 装法。第一屏只回答「该不该用」，`GUIDE.md` 才回答「用起来长什么样」。
+**How it runs** → `GUIDE.md`: the six artifacts / one session's sequence / the three layers of reading / tool capability assumptions / how to install. The first screen only answers "should I use this"; `GUIDE.md` answers "what does it look like in use".
 
-**先说「什么时候别用」**：一两个人的一次性脚本、没有长期维护打算、或者已经有一套被验证在跑的规矩 —— 这套大概率是负担。`skills/fit-kit/SKILL.md` 会直说「不用」，并写下**什么信号出现时再来**。
+**Start with "when not to use it"**: a one-person throwaway script, no intention of long-term maintenance, or a team that already runs a proven method — this is probably a burden. `skills/fit-kit/SKILL.md` will say "skip" plainly, and write down **what signal would change that**.
 
-**它不保证「八九不离十」**：它保证的是「材料不够用」当场可被发现；能不能长期跑下去，取决于你的项目本身、以及你愿不愿意维护那张面。
+**It does not promise "close enough"**: what it guarantees is that "the material is not enough" gets caught on the spot. Whether a project keeps running depends on the project itself, and on whether you are willing to maintain that surface.
 
-**三条来路（先看你在哪一边）**：
+**Three ways in (pick the one you are on)**:
 
-- **你手上有个项目，想知道这套东西适不适合、该用哪几条** → 让 agent 读 `skills/fit-kit/SKILL.md` 按它走。它会先扫你的仓（只看规则文档与体量），再问六个问题，最后给一份**适配计划**；不合适时会直接说「你现在不需要这套」。
-- **你已经在这个仓里干活（入口壳已注入）** → 同样先走 `skills/fit-kit/SKILL.md` 的第 0 步：它只问**一句**（维护这个包 / 用它进你的项目），答「维护」时它先看包里有没有维护者层件：**有**就走它，**没有**（发布件）→ 包内不可改；fork 后自建流程（上游暂不公开）；只想查条目也可以直接看 §L0 地图。
-- **你只是想知道这套在讲什么、暂时不装** → 读 `GUIDE.md` 的 §一 / §四 / §九（约 30 行）：三个事实、一次取舍、什么时候别用。不装也能读完，不用改你的仓。
+- **You have a project and want to know if this fits, and which parts to take** → have an agent read `skills/fit-kit/SKILL.md` and follow it. It scans your repo first (docs and size only), asks six questions, and returns an **adaptation plan**; when it does not fit it says "you don't need this now".
+- **You already work in this repo (the entry shell is injected)** → still start at step 0 of `skills/fit-kit/SKILL.md`: it asks **one** question (maintaining this kit / using it in your project). If you answer "maintaining", it checks whether the maintainer-layer files exist: **yes** → follow them; **no** (a release build) → the package is not editable, fork it and build your own process; to look up a criterion, jump straight to the §L0 map.
+- **You only want to know what this is about, not install it yet** → read §一 / §四 / §九 of `GUIDE.md` (about 30 lines): three facts, one trade-off, when not to use it. Readable without installing, no changes to your repo.
 
-**这是 pilot**：参与方式 / 反馈什么 → `PILOT.md`（`-dev`；不承诺稳定）。
+**This is a pilot**: how to take part / what to send back → `PILOT.md` (`-dev`; no stability promised).
 
-**症状 → 读哪一册**（只到册，不点到条）：
+**Symptom → which volume to read** (volume only, not the entry):
 
-| 你现在的样子 | 读哪里 |
+| What you look like right now | Where to read |
 |---|---|
-| 文档越写越多，没人知道哪份最新 | 05 取料（容量档 / 按节读 / 回退阶梯） |
-| 每次收尾都少东西，下一棒要重新问一遍 | 02 收尾 |
-| 交接件写了，接棒的人还是走错门 | 03 交接 |
-| 检查脚本「跑了但没咬」，绿得很可疑 | 04 门禁 |
-| 同一种坑反复踩，每次都说「下次注意」 | 07 反例 |
-| 把方法搬进别的项目，搬着搬着就走样 | 08 采纳 |
+| Docs keep growing, nobody knows which is current | 05 intake (capacity tiers / read by section / fallback ladder) |
+| Every closeout misses something, the next session asks again | 02 closeout |
+| The handoff was written, and the next session still walks into the wrong door | 03 handoff |
+| The check script "ran but didn't bite" — green is suspicious | 04 gates |
+| The same pit gets stepped in again, every time with "I'll be careful" | 07 anti-patterns |
+| The method gets carried into another project and drifts along the way | 08 adoption |
 
-> **来源 / 适用性** → `GUIDE.md` §一（按适用性读，不按权威性读；不在这里复述 n=1）。
+> **Source / applicability** → §一 of `GUIDE.md` (read for applicability, not authority; n=1 is not restated here).
 
-## L0 地图
+## L0 map
 
-> 手写地图，但**双向机械校验**（探针 1）：地图行 ↔ 定义集合的差集必须为空。**加条目 = 两处同改**（这正是它不会腐烂的原因）。**地图行是一句话摘要** —— **引用具体判据前先打开正文**，别只引这一行。
+> A hand-written map, but **bidirectionally machine-checked** (probe 1): the difference set between map rows and the definition set must be empty. **Adding an entry = change both places** (that is why it does not rot). **A map row is a one-line summary** — **open the full text before citing a criterion**; never cite this row alone.
 
-| ID | 一句话 | 册 |
+| ID | One line | Volume |
 |---|---|---|
-| P-01 | 冷启动最小面 + 硬门：第一屏只 3 件，字节和撞门即强制归档 | 05 取料 |
-| P-02 | 回退阶梯 R0–R3：找不到就按阶梯走，**没找到 ≠ 不存在** | 05 取料 |
-| P-03 | 容量四档 + 硬顶：上限的目的 = 让「没读完」可被发现 | 05 取料 |
-| P-04 | 按节读协议：超阈必须声明；节图即时生成，不许写死行区间 | 05 取料 |
-| P-05 | 配额制 = 强制减法：到顶先退役一条，才能加一条 | 05 取料 |
-| P-06 | 收尾完成标准 = 真源闭合：下一个人能不能不追问 | 02 收尾 |
-| P-07 | 不可延后五类：延后一次就会丢，任何模式当场落盘 | 02 收尾 |
-| P-08 | 写入即分流（过程账进历史区）；常态归档只在棒 / 批次 / 真机窗口收口，撞门另算（P-01） | 02 收尾 |
-| P-09 | 改完必反查：四类触发面、按类枚举形态、**扫全集**、逐条裁决 | 02 收尾 |
-| P-10 | 结论可证伪：数字贴命令尾行，复核换判据 | 02 收尾 |
-| P-11 | 门禁的结论只来自判定行 + 它自己的退出码（三态；WARN 不阻断） | 04 门禁 |
-| P-12 | 会咬 = 可复跑的注入态（配方 / 态 / 隔离 / 同改），一次观测不算；**态的形态要三态**（输入在且错 / 输入不在 / 身份指错）—— 只做第一态证明不了「真实态会咬」 | 04 门禁 |
-| P-13 | 断言值从当前状态推导：写死观测 = 未来假绿或误报 | 04 门禁 |
-| P-14 | 面从全集来；冻结 / 白名单 / 豁免都是欠账，须可枚举 + 过期自检 | 04 门禁 |
-| P-15 | 门禁只覆盖可机械判定的一类；其余靠固定时点问句 | 04 门禁 |
-| P-16 | 交接件只写本棒差异；稳定层只写一处，其余留指针 | 03 交接 |
-| P-17 | 交接件里的「是什么」指回原件或给判据（禁结论性事实 / 期望值） | 03 交接 |
-| P-18 | 必读清单可证伪：带「为什么」、开工逐行解析、只指已跟踪锚点、跳过写明 | 03 交接 |
-| P-19 | 验收 = 独立复跑；自评只作待验清单 | 03 交接 |
-| P-20 | 复核**一棒一次**（收尾、全部写回之后）；边界由派发方给（只读 + 哪几类必查）；回传只作反例清单 | 03 交接 |
-| P-21 | 「根因不同」用**替换测试**判（根因句能互相替换 = 同一条）；实例必须只由该根因解释 | 07 反例 |
-| P-22 | 准入：完成记录 / 无出处的经验 / 转述 / 别人在改的正文**不进 L3**（① 回家 = 台账/记录，② 进 `inbox/`，③④先去打开原件） | 07 反例 |
-| P-23 | 转正：A 的「正解」= 指针 + 动作 + 分工；没有可指的 P = **待转正**（进登记面） | 07 反例 |
-| P-24 | 取证只引「**明天还打得开**」的形态；引原文必标「可能已被订正」+ 复核月 | 07 反例 |
-| P-25 | **摘要不是副本**：标题 / 表头 / 索引行 / 地图行也是书写点，改正文欠一次回改 | 07 反例 |
-| P-26 | **copy 件的完成条件 = 裁到 0 处**：照抄来的骨架必须删掉目标仓没有的每一行 | 05 取料 |
-| P-27 | **验收只在被采纳方的仓里跑，并点名被量的对象**：拿别处的绿当这里的绿 = 没验收 | 08 采纳 |
-| P-28 | **协议只写意图不写判据 → 执行者按自己的判断改**：需要它自己决定的地方就是缺口 | 08 采纳 |
-| P-29 | **采纳记录只写「明天还打得开」的来源**，否则写「未落地」：临时路径 = 填空 | 08 采纳 |
-| P-30 | **「读全」要可证**：引用了内容 ⇒ 拿得出完整覆盖的读记录；只读一部分要写清读了哪节、影响什么 | 05 取料 |
-| P-31 | **去重 = 迁移 + 至少一条可达指针**：删前逐指针审计，禁「删掉就没」 | 02 收尾 |
-| P-32 | 拆卷前先答四问；按读者切，路由页不是最大件；冷启动面永不拆 | 05 取料 |
-| P-33 | 归档完成条件：四条全齐才算搬完（逐字 / 墓碑 + 指针 / 索引登记 / 记尺寸） | 02 收尾 |
+| P-01 | Minimum cold-start surface + hard gate: the first screen is exactly 3 files; the byte sum hitting the limit forces archiving | 05 intake |
+| P-02 | Fallback ladder R0–R3: when something is missing, walk the ladder; **not found ≠ does not exist** | 05 intake |
+| P-03 | Four capacity tiers + hard ceiling: the point of a limit is to make "not fully read" discoverable | 05 intake |
+| P-04 | Read-by-section protocol: over the threshold you must declare it; section maps are generated, never hard-coded line ranges | 05 intake |
+| P-05 | Quota = forced subtraction: at the ceiling, retire one before adding one | 05 intake |
+| P-06 | Closeout is done when the sources of truth are closed: can the next person start without asking | 02 closeout |
+| P-07 | Five things that cannot be deferred: defer once and they are lost — write them down in any mode | 02 closeout |
+| P-08 | Route on write (process notes go to the history area); routine archiving only on a relay/batch/window closeout, capacity hits are separate (P-01) | 02 closeout |
+| P-09 | After a change, search back: four trigger classes, enumerate forms per class, **scan the whole set**, decide every hit | 02 closeout |
+| P-10 | Conclusions must be falsifiable: numbers pasted from command output; re-review with a different criterion | 02 closeout |
+| P-11 | A gate's verdict comes only from its verdict line + its own exit code (three states; WARN does not block) | 04 gates |
+| P-12 | "Bites" = a re-runnable injection state (recipe / state / isolation / change together); one observation does not count; **states need three shapes** (input present but wrong / input absent / identity mis-addressed) | 04 gates |
+| P-13 | Asserted values derive from current state: hard-coded observations become future false-greens or false alarms | 04 gates |
+| P-14 | The surface comes from the whole set; freezes / allowlists / exemptions are debts and must be enumerable + expire-checked | 04 gates |
+| P-15 | Gates cover only the mechanically decidable class; the rest relies on questions at fixed moments | 04 gates |
+| P-16 | A handoff writes only this relay's differences; the stable layer is written once, everything else points at it | 03 handoff |
+| P-17 | "What it is" in a handoff points back at the original or gives a criterion (no conclusive facts / expected values) | 03 handoff |
+| P-18 | The required-reading list must be falsifiable: each row says why, resolves line by line, points only at tracked anchors, and skipped rows are stated | 03 handoff |
+| P-19 | Acceptance = independent re-run; self-assessment is only a to-verify list | 03 handoff |
+| P-20 | One review per relay (at closeout, after all write-backs); the dispatcher sets the boundary (read-only + which classes to check); the report is only a list of counterexamples | 03 handoff |
+| P-21 | "Different root cause" is decided by the **substitution test** (root-cause sentences interchangeable = same entry); an instance must be explained by that root cause alone | 07 anti-patterns |
+| P-22 | Admission: completion records / unsourced experience / retellings / text someone else is editing **do not enter L3** (① go home = ledger/records, ② into `inbox/`, ③④ open the original first) | 07 anti-patterns |
+| P-23 | Promotion: an A's "correct answer" = pointer + action + division of labor; no P to point at = **pending promotion** (into the registry) | 07 anti-patterns |
+| P-24 | Evidence cites only forms that **still open tomorrow**; quoting original text requires "may have been corrected" + a review month | 07 anti-patterns |
+| P-25 | **A summary is not a copy**: titles / table headers / index rows / map rows are also writing points — change the text, you owe the summary a change | 07 anti-patterns |
+| P-26 | A copy artifact is done when it is trimmed to zero: every line the target repo does not have must be deleted | 05 intake |
+| P-27 | Acceptance runs in the adopter's repo and names what is measured: someone else's green is not your green | 08 adoption |
+| P-28 | A protocol that states intent but not criteria → the executor substitutes its own judgment: wherever it must decide, there is a gap | 08 adoption |
+| P-29 | An adoption record cites only sources that still open, otherwise write "not landed": temporary paths are placeholders | 08 adoption |
+| P-30 | "Read in full" must be provable: if you cite content, you can produce a complete coverage record; partial reads state which sections and what they affect | 05 intake |
+| P-31 | De-duplication = migrate + at least one reachable pointer: audit every pointer before deleting; never "delete and it's gone" | 02 closeout |
+| P-32 | Answer four questions before splitting a volume; split by reader; the routing page is never the largest file; the cold-start surface is never split | 05 intake |
+| P-33 | Archiving is done when all four hold (verbatim / tombstone + pointer / index row / recorded size) | 02 closeout |
 
-## 兼容承诺
+## Compatibility promises
 
-只承诺**三样**，其余不承诺（措辞 / 条目数量 / 新增条目的存在性都可变）：
+Only **three** things are promised; the rest is not (wording / entry counts / the existence of new entries can all change):
 
-1. **条目 ID**：`P-NN` / `A-NN` 全局顺延，**不重排、不复用**；退役只留一行 `已退役`，编号不回收。
-2. **目录结构**：`principles/` · `kit/`（`templates/` + `scripts/` + `intake/`）· `anti-patterns/` · `skills/`。（发布件不含证据层、决策记录与作者运维层。）
-3. **脚本 CLI**：`kit/scripts/` 下脚本的用法与退出码（`0` = 通过 / `1` = 门禁红 / `2` = 环境错误）；新增脚本不改变既有语义。
+1. **Entry IDs**: `P-NN` / `A-NN` increase globally, **never reordered, never reused**; retired entries keep a single `已退役` line and the number is not recycled.
+2. **Directory layout**: `principles/` · `kit/` (`templates/` + `scripts/` + `intake/`) · `anti-patterns/` · `skills/`. (The release package does not include the evidence layer, decision records, or the author's operations layer.)
+3. **Script CLI**: usage and exit codes of the scripts under `kit/scripts/` (`0` = pass / `1` = gate red / `2` = environment error); new scripts do not change existing semantics.
 
-## 配置（第 0 步）
+## Configuration (step 0)
 
-`kit.config.json` 是**唯一常量书写点**（脚本与文档都读它，不在别处复述数值）。拷 `kit/templates/kit.config.json.template` 改这四处就够：
+`kit.config.json` is the **single place constants are written** (scripts and docs both read it; values are not restated elsewhere). Copy `kit/templates/kit.config.json.template` and change four places:
 
-| 键 | 管什么 | 常见改法 |
+| Key | What it controls | Common change |
 |---|---|---|
-| `coldStart.files` | 冷启动三件（相对仓根） | 三件放 `docs/` 下就写 `docs/README.md` |
-| `capacityTiers.tiersByDir` | 哪个目录算哪一档 | 台账 / 抽屉目录设 `drawer` 或 `onDemand` |
-| `quotas` | L0 条目数 / inbox 条数上限 | 按项目节奏定，别设成「无限」 |
-| `profile` | `full`（默认）或 `lite` | 只要容量门、暂不要发布门 → `lite` |
+| `coldStart.files` | the cold-start three (relative to repo root) | if they live under `docs/`, write `docs/README.md` |
+| `capacityTiers.tiersByDir` | which directory belongs to which tier | set ledger / drawer directories to `drawer` or `onDemand` |
+| `quotas` | L0 entry count / inbox entry ceiling | set to your project's pace; never "unlimited" |
+| `profile` | `full` (default) or `lite` | only the capacity gate, no release gate yet → `lite` |
 
-**本包自己的配置**（读它的门槛）：`profile: lite`（发布件不带发布门）+ `probes.evidenceRow: false`（判据不写证据行）+ `coldStart.files` 只列 `README.md`（包本身不是工作区；这一项只为让 `cold-start-size` 有对象可量）。
+**This package's own config** (what its gates read): `profile: lite` (no release gate in the release build) + `probes.evidenceRow: false` (criteria do not carry evidence rows) + `coldStart.files` lists only `README.md` (the package itself is not a workspace; this entry only gives `cold-start-size` something to measure).
 
-**装进既有项目**：先 `node kit/scripts/check-kit.mjs --update-baseline` 冻结存量（只对新增/变大判容量），再按 `drawer` / `onDemand` 给老目录定档 —— 否则第一天全红。
+**Installing into an existing project**: first run `node kit/scripts/check-kit.mjs --update-baseline` to freeze the status quo (capacity is judged only for new or grown files), then assign old directories `drawer` / `onDemand` — otherwise everything is red on day one.
 
-## 维护
+## Maintenance
 
-- **维护这个包** → 你手上的是**发布件**：包内不可改（改了下次重建会被冲掉）。要改请 fork 后自建维护流程（上游暂不公开）—— 分权 / 收尾 / 落点表这类动作层文件不随包分发。
-- **接手先跑一次门禁**：`node kit/scripts/check-kit.mjs` + `node kit/scripts/cold-start-size.mjs`（都只读），看当前状态再动手。
-- 本文件就是本包的冷启动面（真源 = `kit.config.json` → `coldStart.files`）：**写它就是花冷启动预算**，加段前先算字节。
-- **改首屏 = 三处同改**：中文 pitch、顶部英文摘要、`README.en.md` 是同一件事的三个视图；同时改，别只改一处。
-- 改任何阈值 / 档位 / 配额：**只改 `kit.config.json`**，再跑 `node kit/scripts/check-kit.mjs`。文档只写指针，不复述数值。
-- **许可 / 第三方声明** → `LICENSE`（MIT 代码 / 配置（含 *.json.template）+ CC BY 4.0 文档 / *.md.template）· `CREDITS.md`（Matt Pocock MIT）。
+- **Maintaining this package** → what you have is a **release build**: the package is not editable (changes are overwritten on the next rebuild). To change it, fork it and build your own maintenance process (upstream is not public yet) — the operations layer (division of labor / closeout / material placement) does not ship with the package.
+- **Run the gates once when you take over**: `node kit/scripts/check-kit.mjs` + `node kit/scripts/cold-start-size.mjs` (both read-only), then act.
+- This file is the package's cold-start surface (source: `kit.config.json` → `coldStart.files`): **writing it spends the cold-start budget**, so calculate bytes before adding a section.
+- **Changing the first screen = change both**: `README.md` (default English) and `README.zh.md` (Chinese) are two views of the same thing; change them together.
+- To change any threshold / tier / quota: **edit `kit.config.json` only**, then run `node kit/scripts/check-kit.mjs`. Docs carry pointers, never values.
+- **License / third-party notices** → `LICENSE` (MIT for code / config (incl. *.json.template) + CC BY 4.0 for docs / *.md.template) · `CREDITS.md` (Matt Pocock MIT).

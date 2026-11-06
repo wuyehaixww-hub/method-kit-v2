@@ -26,9 +26,12 @@ function copyTo(dst) {
 }
 function run(cwd, dir, script, args) {
   try {
-    execFileSync(process.execPath, [join(dir, "kit", "scripts", script), ...(args || [])], { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
-    return 0;
-  } catch (e) { return typeof e.status === "number" ? e.status : -1; }
+    const stdout = execFileSync(process.execPath, [join(dir, "kit", "scripts", script), ...(args || [])], { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+    return { status: 0, stdout };
+  } catch (e) {
+    // 非零退出时 execFileSync 抛错；stdout 仍要收 —— 输出断言（B3-8）靠它
+    return { status: typeof e.status === "number" ? e.status : -1, stdout: String(e.stdout || "") };
+  }
 }
 function rewrite(file, fn) { writeFileSync(file, fn(readFileSync(file, "utf8")), "utf8"); }
 // 让 CLAUDE.md 补到「总字节 = 上限 - margin」，返回该补白长度（margin < 强制归档线 → 触发 WARN）
@@ -211,11 +214,50 @@ const CASES = [
     mkdirSync(join(d, "inbox"), { recursive: true });
     for (let i = 0; i < 51; i++) writeFileSync(join(d, "inbox", "x" + i + ".md"), "# x\n", "utf8");
   }, true],
+  // —— project-scan 识别面（2026-11-06 B3-8）：10 正 + 3 负；只断言输出契约，不看计数（P-13）——
+  // 隔离：从 project-scan 的 MANIFESTS 删掉对应 reader → 正例变红；把 token 提取退回全文小写 → 两个 URL 负例变红。
+  ["scan-pyproject", 0, "project-scan.mjs", (d) => {
+    writeFileSync(join(d, "pyproject.toml"), "[project]\nname = \"x\"\ndependencies = [\n  \"sqlalchemy>=2\",\n]\n\n[project.optional-dependencies]\ndev = [\"httpx\"]\n", "utf8");
+  }, true, [], { has: [/声明式文件：.*pyproject\.toml/, /持久化/, /网络/] }],
+  ["scan-package-json", 0, "project-scan.mjs", (d) => {
+    writeFileSync(join(d, "package.json"), "{\"dependencies\": {\"axios\": \"1.0.0\", \"prisma\": \"5.0.0\"}}", "utf8");
+  }, true, [], { has: [/声明式文件：.*package\.json/, /持久化/, /网络/] }],
+  ["scan-pubspec", 0, "project-scan.mjs", (d) => {
+    writeFileSync(join(d, "pubspec.yaml"), "name: x\n\ndependencies:\n  http: ^1.0.0\n  sqflite: ^2.0.0\n", "utf8");
+  }, true, [], { has: [/声明式文件：.*pubspec\.yaml/, /持久化/, /网络/] }],
+  ["scan-cargo", 0, "project-scan.mjs", (d) => {
+    writeFileSync(join(d, "Cargo.toml"), "[package]\nname = \"x\"\nversion = \"0.1.0\"\n\n[dependencies]\nsqlx = { version = \"0.7\", features = [\"sqlite\"] }\nreqwest = \"0.11\"\n", "utf8");
+  }, true, [], { has: [/声明式文件：.*Cargo\.toml/, /持久化/, /网络/] }],
+  ["scan-go", 0, "project-scan.mjs", (d) => {
+    writeFileSync(join(d, "go.mod"), "module example.com/x\n\ngo 1.22\n\nrequire (\n\tgithub.com/jackc/pgx/v5 v5.5.0\n\tgithub.com/go-resty/resty/v2 v2.11.0\n)\n", "utf8");
+  }, true, [], { has: [/声明式文件：.*go\.mod/, /持久化/, /网络/] }],
+  ["scan-requirements", 0, "project-scan.mjs", (d) => {
+    writeFileSync(join(d, "requirements.txt"), "sqlalchemy==2.0\nrequests>=2.31\n", "utf8");
+  }, true, [], { has: [/声明式文件：.*requirements\.txt/, /持久化/, /网络/] }],
+  ["scan-composer", 0, "project-scan.mjs", (d) => {
+    writeFileSync(join(d, "composer.json"), "{\"require\": {\"doctrine/orm\": \"^2.0\", \"guzzlehttp/guzzle\": \"^7.0\"}}", "utf8");
+  }, true, [], { has: [/声明式文件：.*composer\.json/, /持久化/, /网络/] }],
+  ["scan-gemfile", 0, "project-scan.mjs", (d) => {
+    writeFileSync(join(d, "Gemfile"), "source \"https://rubygems.org\"\n\ngem \"sequel\"\ngem \"faraday\"\n", "utf8");
+  }, true, [], { has: [/声明式文件：.*Gemfile/, /持久化/, /网络/] }],
+  ["scan-pom", 0, "project-scan.mjs", (d) => {
+    writeFileSync(join(d, "pom.xml"), "<project><dependencies><dependency><groupId>org.hibernate</groupId><artifactId>hibernate-core</artifactId></dependency><dependency><groupId>com.squareup.okhttp3</groupId><artifactId>okhttp</artifactId></dependency></dependencies></project>", "utf8");
+  }, true, [], { has: [/声明式文件：.*pom\.xml/, /持久化/, /网络/] }],
+  ["scan-gradle", 0, "project-scan.mjs", (d) => {
+    writeFileSync(join(d, "build.gradle"), "dependencies {\n  implementation(\"org.jetbrains.exposed:exposed-core:0.50.0\")\n  implementation(\"com.squareup.retrofit2:retrofit:2.9.0\")\n}\n", "utf8");
+  }, true, [], { has: [/声明式文件：.*build\.gradle/, /持久化/, /网络/] }],
+  ["scan-no-manifest", 0, "project-scan.mjs", () => {}, true, [], { has: [/声明式文件：无/], hasNot: [/持久化/, /网络/] }],
+  ["scan-pyproject-url-only", 0, "project-scan.mjs", (d) => {
+    writeFileSync(join(d, "pyproject.toml"), "[project]\nname = \"x\"\n\n[project.urls]\nHomepage = \"https://example.com\"\n", "utf8");
+  }, true, [], { has: [/声明式文件：.*pyproject\.toml/], hasNot: [/网络/] }],
+  ["scan-pubspec-url-only", 0, "project-scan.mjs", (d) => {
+    writeFileSync(join(d, "pubspec.yaml"), "name: x\nhomepage: https://example.com\nenvironment:\n  sdk: \">=3.0.0 <4.0.0\"\n", "utf8");
+  }, true, [], { has: [/声明式文件：.*pubspec\.yaml/], hasNot: [/网络/, /持久化/] }],
 ];
 
 let bad = 0;
 try {
-  for (const [tag, want, script, mutate, useRoot, extraArgs] of CASES) {
+  for (const [tag, want, script, mutate, useRoot, extraArgs, expect] of CASES) {
     let d;
     if (tag === "config-in-ancestor") {
       const parent = join(BASE, "anc");
@@ -234,10 +276,17 @@ try {
       mkdirSync(cwdForRun, { recursive: true });
     }
     const args = [...(useRoot ? ["--root", d] : []), ...(extraArgs || [])];
-    const got = run(cwdForRun, d, script, args);
-    const pass = got === want;
+    const res = run(cwdForRun, d, script, args);
+    const got = res.status;
+    // expect 可选：has = 输出必须命中；hasNot = 输出不得命中（B3-8：project-scan 的输出契约）
+    const outOk = !expect || (
+      (expect.has || []).every((re) => re.test(res.stdout)) &&
+      (expect.hasNot || []).every((re) => !re.test(res.stdout))
+    );
+    const pass = got === want && outOk;
     if (!pass) bad++;
-    console.log((pass ? "[selftest] PASS " : "[selftest] FAIL ") + tag.padEnd(22) + (script === "check-kit.mjs" ? "check-kit  " : script === "trim-scan.mjs" ? "trim-scan  " : "cold-start  ") + "exit " + got + "（期望 " + want + "）");
+    const label = script === "check-kit.mjs" ? "check-kit  " : script === "trim-scan.mjs" ? "trim-scan  " : script === "project-scan.mjs" ? "project-scan" : "cold-start  ";
+    console.log((pass ? "[selftest] PASS " : "[selftest] FAIL ") + tag.padEnd(22) + label + " exit " + got + "（期望 " + want + "）" + (expect ? " · 输出断言 " + (outOk ? "PASS" : "FAIL") : ""));
   }
 } finally {
   if (process.env.KIT_SELFTEST_KEEP) console.log("[selftest] 保留副本：" + BASE);

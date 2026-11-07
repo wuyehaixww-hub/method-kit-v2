@@ -111,7 +111,7 @@ Only **three** things are promised; the rest is not (wording / entry counts / th
 
 | Key | What it controls | Common change |
 |---|---|---|
-| `coldStart.files` | the cold-start three (relative to repo root) | if they live under `docs/`, write `docs/README.md` |
+| `coldStart.files` | the cold-start three (relative to repo root) | if they live under `docs/`, prefix each name with `docs/` |
 | `capacityTiers.tiersByDir` | which directory belongs to which tier | set ledger / drawer directories to `drawer` or `onDemand` |
 | `quotas` | L0 entry count / inbox entry ceiling | set to your project's pace; never "unlimited" |
 | `profile` | `full` (default) or `lite` | only the capacity gate, no release gate yet → `lite` |

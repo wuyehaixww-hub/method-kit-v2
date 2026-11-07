@@ -95,7 +95,7 @@ description: Use when project docs are growing and someone asks "is this doc too
 
 ## 记录
 
-- 默认写一份（上面格式）；路径三级：`session-notes/` → `docs/` → 仓根 `doc-governance-<日期>.md`（都没有就落根并说明）。
+- 默认写一份（上面格式）；路径三级：`<记录目录>/` → `docs/` → 仓根 `doc-governance-<日期>.md`（都没有就落根并说明）。
 - **同场已按 `fit-kit` 写过记录** → 把体检单并入同一份，不另起文件。
 - 用户说「别写」→ 不写，对话里给结论并标「未落盘」。
 

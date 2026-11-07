@@ -19,7 +19,7 @@ It is not "adopt" (`skills/adopt-kit/SKILL.md`) and not "extract" (`skills/extra
 
 - You have decided on the whole kit → go straight to `skills/adopt-kit/SKILL.md`.
 - You already have a named failure → go straight to `skills/extract-kit/SKILL.md` (one at a time).
-- You want to maintain method-kit itself → answer "maintaining" at §0: if the package **has** `WORKFLOW.md`, follow it (the maintainer layer: division of labor / closeout / where material goes); **no** `WORKFLOW.md` = you have a release build, the package is not editable — change it upstream or fork and build your own process.
+- You want to maintain method-kit itself → answer "maintaining" at §0: if the package **has** a maintainer layer (division of labor / closeout / where material goes), follow it; **no** maintainer layer = you have a release build, the package is not editable — change it upstream or fork and build your own process.
 
 ## Hard discipline (six rules; crossing them is failure)
 
@@ -34,7 +34,7 @@ It is not "adopt" (`skills/adopt-kit/SKILL.md`) and not "extract" (`skills/extra
 
 | Question | How to get it | Watch out |
 |---|---|---|
-| Is this about **maintaining** the kit, or **using it in your project** | Must ask, one sentence | maintaining → look for `WORKFLOW.md`: present → point there, this session ends; absent → say "this is a release build, the package is not editable", session ends (both **end the interview**) |
+| Is this about **maintaining** the kit, or **using it in your project** | Must ask, one sentence | maintaining → look for a maintainer layer (division of labor / closeout / where material goes): present → point there, this session ends; absent → say "this is a release build, the package is not editable", session ends (both **end the interview**) |
 | Where is the target project | **Self-answer in two steps**: ① is cwd **the method repo itself** (package root has both `kit.config.json` and `skills/`)? yes → ask for the target, **never treat the package as the target** ② no → is cwd a repo (has `README.md` / `.git` / `CLAUDE.md`)? | ② yes → report it and confirm; ② no → ask for a path; **not built yet** → ask lifetime / volume / difficulty first |
 | **Where this copy of the method** lives | Must ask, three options | leave it / move it next to the project / **put it inside the project**. Putting it inside **requires a warning**: the user's own gates will scan **its** files too (capacity tiers / dead links / IDs) and may turn red immediately |
 
@@ -155,7 +155,7 @@ Exclude `.git` / `node_modules` / `vendor` / `dist` / `build` and generated file
 **Three banned phrasings** (writing them equals not explaining): ① "this doesn't suit your project" (no facts); ② "see `GUIDE.md`" (pushes the judgment back onto someone who will never read it); ③ "come back when your project grows" (no decidable signal — write "come back when phenomenon Y appears").
 
 ### 5.2 The record (**written by default**; ask first only when permission is limited or the user explicitly doesn't want a file)
-**The record is the only file this protocol may write** (nothing else in the user's repo). Write it by default, then tell the user where it landed and why it is worth keeping ("without it, in three months nobody remembers why only three artifacts were installed"). If they say "don't write it" on the spot → don't; give the conclusion in the conversation and mark it "not written to disk". **Two cases where you ask first**: ① no write permission ② the user explicitly doesn't want extra files. **Path, three levels**: `session-notes/` → `docs/` → **repo root** `fit-kit-<YYYY-MM-DD>.md` (if neither exists, use the root and explain why). **Format (10 lines)**:
+**The record is the only file this protocol may write** (nothing else in the user's repo). Write it by default, then tell the user where it landed and why it is worth keeping ("without it, in three months nobody remembers why only three artifacts were installed"). If they say "don't write it" on the spot → don't; give the conclusion in the conversation and mark it "not written to disk". **Two cases where you ask first**: ① no write permission ② the user explicitly doesn't want extra files. **Path, three levels**: `<record dir>/` → `docs/` → **repo root** `fit-kit-<YYYY-MM-DD>.md` (if neither exists, use the root and explain why). **Format (10 lines)**:
 
 - date · target repo · method repo path · baseline (commit)
 - current state (3 facts from the scan, each with a source)

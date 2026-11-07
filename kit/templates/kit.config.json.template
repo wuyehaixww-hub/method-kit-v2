@@ -9,7 +9,7 @@
   },
   "capacityTiers": {
     "default": "readyThrough",
-    "tiersByDir": { "evidence/": "onDemand", "docs/": "onDemand", "archive/": "drawer", "session-notes/": "onDemand" },
+    "tiersByDir": { "docs/": "onDemand", "notes/": "onDemand", "archive/": "drawer" },
     "readyThrough": { "limitBytes": 51200, "warnBytes": 40960 },
     "onDemand": { "limitBytes": 102400 },
     "indexList": { "limitBytes": 153600 },

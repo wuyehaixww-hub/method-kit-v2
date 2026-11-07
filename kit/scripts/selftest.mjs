@@ -126,7 +126,7 @@ const CASES = [
       rewrite(join(d, "principles", f), (t) => t.replace(/^> 证据：.*$/m, ""));
     }
   }, true],
-  // 探针 12 的 P 侧「证据行关闭」态（2026-11-02 / ADR-0003 §6②）：配置置 false + 删证据行 → 必须绿。
+  // 探针 12 的 P 侧「证据行关闭」态（2026-11-02）：配置置 false + 删证据行 → 必须绿。
   // 与上一条 missing-evidence 成对：**默认仍红**（不削弱本方法仓的门）+ **关闭后绿**（V2 能用同一套门禁）。只测关闭不测默认 = 假绿。
   ["evidence-row-off", 0, "check-kit.mjs", (d) => {
     const p = join(d, "kit.config.json");

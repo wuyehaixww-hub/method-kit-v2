@@ -25,7 +25,7 @@ description: Use when a new (greenfield) or existing project has to be fitted wi
 |---|---|---|
 | 第 4 问「目录里已有什么」 | **跳过**（答案恒为「空」） | 照问 |
 | `--update-baseline` | **不适用**（无存量） | **仅当你要把 `check-kit` 也装进目标仓时**才需要先冻结；本 skill 默认不装它（见「不做」） |
-| 默认装几件 | **至少 3 件**（`coldstart` / `agency` / `intake` 常驻）；其余件**按它自己的 `to_enable_when`** 决定，**不按轴的并集** | 按候选轮两档 |
+| 默认装几件 | **至少 3 件**（`coldstart` / `agency` / `intake` 常驻）；其余件**按它自己的 `to_enable_when`** 决定，**不按轴的并集** | 按候选轮三档（见 §五 第 3 步） |
 | 额外一步 | **定「第一周交付物」** —— 治理面装完那天项目还没有任何产出；不设交付物，治理面会自我复制 | — |
 
 绿地不是另一套流程，是同一套的**分支**：少问一问、多一个交付物。
@@ -34,7 +34,7 @@ description: Use when a new (greenfield) or existing project has to be fitted wi
 
 1. **扫事实**：`node kit/scripts/project-scan.mjs --root <目标目录>`。它给事实 + 标 `[?]` 的推断；**推断只用来提问，不当结论**。绿地里「扫不出东西」**本身就是结论**（别把空目录读成「再等等」）。**本协议里所有 `kit/…` 路径都相对 kit 根，不是相对你的项目** —— 站在项目目录里直接敲 `kit/scripts/…` 是找不到的。
 2. **开放轮（7 问，不给选项）**：见下表。**每题都有默认值 —— 跳过 = 采纳默认，不产生负债感**；一轮问完，别边问边给方案。绿地跳过第 4 问。
-3. **候选轮（才给选项）**：用轴取值跑 `node kit/scripts/adopt-plan.mjs --horizon=… --risk=… --scale=… --agency=…`。**它的输出是候选池，不是结论**（轴的并集）。逐件用它自己的 `to_enable_when` 过滤 → 这才是「**最小**」档；再把 scale/risk 各升一档 = 「标准」档。每档写清**放弃了什么**，只问一句：「选哪个 / 要加哪件」。
+3. **候选轮（才给选项）**：用轴取值跑 `node kit/scripts/adopt-plan.mjs --horizon=… --risk=… --scale=… --agency=…`。**它的输出是候选池，不是结论**（轴的并集）。逐件用它自己的 `to_enable_when` 过滤 → 这才是「**最小**」档；再把 scale/risk 各升一档 = 「常规」档；再加收尾 / 接力 / 台账 = 「全量」档。每档写清**放弃了什么**，只问一句：「选哪个 / 要加哪件」。
    **对账（矩阵给的是候选，不是结论）**：逐件再用它自己的 `to_enable_when` 过一遍 —— **专有触发优先于轴的粗筛**。`include` 回答「这条轴下值得看哪几件」，`to_enable_when` 回答「这一件的条件到了没有」；两边不一致以 `to_enable_when` 为准，被筛掉的件连同它的触发写进「不装」。**别把 `adopt-plan` 的输出当最终答案**（它只读 `include`，读不到 `to_enable_when`）。
 4. **建面 + 记录**：装 `copy` 类件（照 plan 的「拷」行）。**copy 件 = 照抄再裁剪**（merge 与改写都不算 copy；三条动作与判据 = `coldstart-intake` 第 1 步，`INTAKE.md` 与冷启动三件同样适用）；`guide` 类件按 plan 的「做」行动手写 3–5 行。然后填 `kit/templates/INTAKE.md.template` → 目标项目的 `INTAKE.md`（**含决策权表与术语**；绿地另写「第一周交付物」），并在 `WORKSPACE-NOTES.md` 的「当前状态」里加一行指向它。建冷启动面时调 `coldstart-intake`（不在此重复它的步骤）。 **装了 `progress` 类件时**：把 `kit/templates/grill-decisions.md.template` 与 `kit/templates/closeout-todo.md.template` 拷进目标项目的记录区，并把「什么时候写」写进入口壳 —— 一轮里有 ≥2 个待裁问题 → 决策面；收尾有 ≥3 项要延后 → 登记面。
    **源不在手边时**：`copy` 件的模板 / 脚本没拷过来就是没有 —— **不许手写替身**（那就不是 copy 件了）。标「未落地 + 缺哪几个文件」，写进 INTAKE 的验收列，**别留空、也别假装装上了**。
@@ -49,7 +49,7 @@ description: Use when a new (greenfield) or existing project has to be fitted wi
 | 2 | 最怕哪种坏结果？（无所谓 / 改坏对外契约 / 丢数据） | 决定门禁强度，不决定件数 | none（但扫描器报持久化/发布信号时默认升 contract） |
 | 3 | 谁拍板？（你 / 你听建议 / AI 执行你抽查） | 决定分权与解释密度，**不改变件数** | copilot |
 | 4 | 现在目录里已有什么？（空 / 有码 / 有文档 / 有历史包袱） | 决定要不要先 `--update-baseline` 冻结存量 | 按扫描结果（绿地 = 空，不问） |
-| 5 | 愿意为「以后省事」现在付多少？（0 / 半小时 / 半天） | 0 → 只装 coldstart；半小时 → 标准；半天 → 长期 | 半小时 |
+| 5 | 愿意为「以后省事」现在装多少？（**最小面 / 常规 / 全量**；三档内容 = `fit-kit` §2 Q6，本处不定义） | 最小面 → 只装 coldstart；常规 / 全量 → 按 `fit-kit` Q6 的件表 | 常规 |
 | 6 | 会有几个会话 / 几个人碰它？ | 3 个会话或 2 个人 → relay 从「不装」变「装」 | 1 人 1 会话 |
 | 7 | 有没有不可逆的东西？（发布 / 外部用户 / 真实数据） | 有 → adr 必须装，risk 升一档 | 无 |
 

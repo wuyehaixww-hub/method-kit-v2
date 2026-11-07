@@ -13,12 +13,12 @@
 //   7) 删 kit.config.json            → exit 2 + 人话（不是裸栈）
 //   8) matrix.json 的 always 写个不存在的件 → 探针 11（接入矩阵自洽）
 //   9) 删 principles/ 某条的 「> 证据：」 行  → 探针 12（条目可复核）
-//  10) 往 session-notes/ 放一个 > sectionRead.thresholdBytes、但仍 < 该档上限的 .md（不带「按节读」）→ 探针 7（oversize-volume 会连带触 3，这个只触 7）
+//  10) 往 onDemand 档目录放一个 > sectionRead.thresholdBytes、但仍 < 该档上限的 .md（不带「按节读」）→ 探针 7（oversize-volume 会连带触 3，这个只触 7）
 //  11) 删掉某条 `## A-NN` 里所有 `P-NN` 指针（或「怎么早发现」行）→ 探针 12 的 A 侧（2026-10-31 补）
 //  12) 在任一 .md 里写一个三反引号围栏块（或未闭合围栏 / ~~~）、再写一条死链（如 `kit/scripts/nope.md`）→ 探针 5（逐行配对，围栏不再吞链，2026-11-06 补）
 //  13) kit.config.json 的 probes.evidenceRow 置 false + 删 principles/ 某条「> 证据：」→ 探针 12 的 P 侧应**不**报（= selftest 的 evidence-row-off；默认 true 时同一注入必红 = missing-evidence）
 // 以上各条 + cold-start 五态是**核心配方**；完整态清单以 selftest.mjs 的 CASES 为准（探针 3 / 5 / 7 / 12 另有专属态）。
-// 隔离态：探针 3 = oversize-ondemand · 探针 5 = fence-deadlink / stray-tick-deadlink / unclosed-fence-deadlink / tilde-fence-deadlink（2026-11-06）· 探针 7 = section-read-missing（2026-10-31）· 探针 12 = missing-evidence（P 侧）/ antipattern-unlinked（A 侧，2026-10-31）/ evidence-row-off（配置关闭态，2026-11-02）；探针 4 仍缺（与探针 2 面重叠，登记 = session-notes/rollout-ledger.md §5）。
+// 隔离态：探针 3 = oversize-ondemand · 探针 5 = fence-deadlink / stray-tick-deadlink / unclosed-fence-deadlink / tilde-fence-deadlink（2026-11-06）· 探针 7 = section-read-missing（2026-10-31）· 探针 12 = missing-evidence（P 侧）/ antipattern-unlinked（A 侧，2026-10-31）/ evidence-row-off（配置关闭态，2026-11-02）；探针 4 仍缺（与探针 2 面重叠，登记 = 留后登记面 §5）。
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { join, resolve, dirname, relative, extname, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -64,7 +64,7 @@ const profileArg = argVal("--profile");
 const profile = profileArg || cfg.profile || "full";
 if (profile !== "lite" && profile !== "full") die("--profile 只接受 lite / full（收到 " + profile + "）");
 const strictRelease = profile === "full";
-// 探针 12 的 P 侧「证据行」检查做成配置项（ADR-0003 §6②）：V2 的判据按 C6 不写证据行，
+// 探针 12 的 P 侧「证据行」检查做成配置项：V2 的判据不写证据行，
 // 但它仍要能跑这套门禁 → 出厂件在自己的 kit.config.json 里置 false。**默认 true**（不削弱本方法仓的门）。
 const requireEvidenceRow = !(cfg.probes && cfg.probes.evidenceRow === false);
 
@@ -276,7 +276,7 @@ if (existsSync(matrixPath)) {
 // —— 探针 12：条目必须可复核（两侧；带「已退役」的条目豁免）
 //   P 侧（principles/）：`> 证据：` 行 + 至少一个 A-NN + 「怎么查」。
 //   A 侧（anti-patterns/）：至少一个 P-NN（= 它指得回一条判据 / 待转正）+「怎么早发现」。
-// 为什么两侧都判：P-06..P-10 的核心主张是「结论要能被复核」—— 原则自己先得做到（否则 `SELFCHECK.md` §A7「横铺 = 抄标题」）；
+// 为什么两侧都判：P-06..P-10 的核心主张是「结论要能被复核」—— 原则自己先得做到（否则「横铺 = 抄标题」）；
 // 反例同理：不指回判据的反例只是一段故事（P-23），没有「怎么早发现」的反例只能事后读。A 侧只判「有没有指」，不判「指得对不对」（= P-15 的不可机械类）。
 for (const [p, t] of txt) {
   const r0 = rel(p);
@@ -288,7 +288,7 @@ for (const [p, t] of txt) {
     if (!head) continue;
     const id = head[1];
     if (id.startsWith("P-") !== isPrinciple) continue; // 只判本目录该有的条目：P 在 principles/，A 在 anti-patterns/
-    if (/^> \*\*已退役\*\*/m.test(sec)) continue; // 只认 WORKFLOW §retire 规定的标记行
+    if (/^> \*\*已退役\*\*/m.test(sec)) continue; // 只认收尾清单规定的退役标记行
     if (isPrinciple) {
       if (requireEvidenceRow && !/^> 证据：/m.test(sec)) fails.push("缺证据行 " + id + "（" + r0 + " · 探针 12）");
       if (!/\bA-\d{2}\b/.test(sec)) fails.push("未引用任何反例 " + id + "（" + r0 + " · 探针 12）");
@@ -300,8 +300,8 @@ for (const [p, t] of txt) {
   }
 }
 
-// —— 探针 14：册号跨三目录一致（principles/ · anti-patterns/ · evidence/ 同名同号）
-// 编号 = 14：台账 §5 的「候选探针 13」（handoff 五段）仍占 13 号，别再撞。
+// —— 探针 14：册号跨目录一致（principles/ · anti-patterns/ 同名同号）
+// 编号 = 14：「候选探针 13」（handoff 五段）仍占 13 号，别再撞。
 // 判两件事：① 文件名 NN 与首行「· NN 」一致；② 同一 slug 在三目录里必须是同一个号、同一号必须是同一个 slug。
 // 为什么：B2b-7 真出过 01/05 同名两号（牵 28 处 / 9 文件），当时只统一了数据、没加门。
 const VOL_DIRS = ["principles", "anti-patterns", "evidence"];

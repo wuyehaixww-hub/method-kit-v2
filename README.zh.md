@@ -106,7 +106,7 @@ method-kit 只做一件事：**让下一个会话用最少的材料直接开工�
 
 | 键 | 管什么 | 常见改法 |
 |---|---|---|
-| `coldStart.files` | 冷启动三件（相对仓根） | 三件放 `docs/` 下就写 `docs/README.md` |
+| `coldStart.files` | 冷启动三件（相对仓根） | 三件放 `docs/` 下就给每个名字加 `docs/` 前缀 |
 | `capacityTiers.tiersByDir` | 哪个目录算哪一档 | 台账 / 抽屉目录设 `drawer` 或 `onDemand` |
 | `quotas` | L0 条目数 / inbox 条数上限 | 按项目节奏定，别设成「无限」 |
 | `profile` | `full`（默认）或 `lite` | 只要容量门、暂不要发布门 → `lite` |
